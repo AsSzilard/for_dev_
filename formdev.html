@@ -1,0 +1,3922 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FormDev — Formülasyon Geliştirme Takip</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root {
+  --dark-blue:#1F3864; --mid-blue:#2E75B6; --light-blue:#D6E4F0; --accent:#E8F4FD;
+  --dark-grn:#1A5C38; --mid-grn:#375623; --light-grn:#E2EFDA;
+  --dark-red:#7B1515; --light-red:#FFE0E0;
+  --yellow:#FFF2CC; --dark-yel:#7F6000;
+  --purple:#6B21A8; --light-pur:#EDE7F6;
+  --gray:#F2F2F2; --gray-mid:#CBD5E1; --gray-dark:#64748B;
+  --white:#FFFFFF; --text:#1E293B;
+  --sidebar-w:220px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#F1F5F9;color:var(--text);display:flex;min-height:100vh;font-size:14px}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-w);background:var(--dark-blue);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+#sidebar .logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.15)}
+#sidebar .logo h1{color:#fff;font-size:16px;font-weight:700;letter-spacing:.5px}
+#sidebar .logo small{color:#93C5FD;font-size:11px}
+#sidebar nav{flex:1;padding:10px 0}
+.nav-group{padding:8px 12px 4px;color:#93C5FD;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;color:#CBD5E1;transition:.15s;font-size:13px;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.12);color:#fff;border-left-color:#60A5FA}
+.nav-item .icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+#sidebar .bottom{padding:12px;border-top:1px solid rgba(255,255,255,.1)}
+.save-btn{width:100%;padding:8px;background:var(--mid-blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600}
+.save-btn:hover{background:#1D4E8A}
+
+/* MAIN */
+#main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.page-header{background:var(--white);border-bottom:1px solid #E2E8F0;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.page-header h2{font-size:17px;font-weight:700;color:var(--dark-blue)}
+.page-header .badge{background:var(--light-blue);color:var(--mid-blue);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.content{padding:20px 24px;flex:1}
+
+/* CARDS */
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:16px;overflow:hidden}
+.card-header{padding:12px 16px;background:var(--dark-blue);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:space-between}
+.card-header.blue{background:var(--mid-blue)}
+.card-header.green{background:var(--dark-grn)}
+.card-header.yellow{background:var(--dark-yel)}
+.card-header.red{background:var(--dark-red)}
+.card-header.purple{background:var(--purple)}
+.card-body{padding:16px}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-dark);margin:16px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--light-blue)}
+
+/* FORMS */
+.form-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:11px;font-weight:600;color:var(--gray-dark);text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select,.form-group textarea{padding:7px 10px;border:1.5px solid #CBD5E1;border-radius:6px;font-size:13px;color:var(--text);background:#fff;transition:.15s;font-family:inherit}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--mid-blue);background:#F0F7FF}
+.form-group input[readonly]{background:var(--light-blue);color:var(--mid-blue);font-weight:600;cursor:default}
+.form-group.input-highlight input{background:var(--yellow);border-color:var(--dark-yel)}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+table th{background:var(--mid-blue);color:#fff;padding:7px 10px;text-align:center;font-weight:600;white-space:nowrap;position:sticky;top:0}
+table th.dark{background:var(--dark-blue)}
+table th.green{background:var(--dark-grn)}
+table td{padding:6px 8px;border-bottom:1px solid #F1F5F9;text-align:center}
+table tr:hover td{background:#F8FAFF}
+table td.label-td{text-align:left;font-weight:600;color:var(--text);background:var(--gray);white-space:nowrap;padding-left:10px}
+table td input{width:100%;padding:4px 6px;border:1.5px solid #E2E8F0;border-radius:4px;text-align:center;font-size:12px;background:var(--accent);font-family:inherit}
+table td input:focus{outline:none;border-color:var(--mid-blue);background:#E0F0FF}
+table td.stat{background:var(--light-blue);font-weight:700;color:var(--dark-blue)}
+table td.stat-grn{background:var(--light-grn);font-weight:700;color:var(--dark-grn)}
+table td.stat-yel{background:var(--yellow);font-weight:700;color:var(--dark-yel)}
+table td.api-row{background:#FEFCE8}
+table .section-row td{background:#415A77;color:#fff;font-weight:700;text-align:left;padding:5px 10px;font-size:11px}
+.result-chip{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700}
+.chip-pass{background:#DCFCE7;color:#166534}
+.chip-fail{background:#FEE2E2;color:#991B1B}
+.chip-info{background:var(--light-blue);color:var(--dark-blue)}
+
+/* BUTTONS */
+.btn{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:var(--mid-blue);color:#fff}.btn-primary:hover{background:#1D4E8A}
+.btn-success{background:var(--dark-grn);color:#fff}.btn-success:hover{background:#0F3D25}
+.btn-danger{background:var(--dark-red);color:#fff}.btn-danger:hover{background:#5B0F0F}
+.btn-warn{background:var(--dark-yel);color:#fff}.btn-warn:hover{background:#5A4400}
+.btn-ghost{background:transparent;color:var(--gray-dark);border:1.5px solid #CBD5E1}.btn-ghost:hover{background:var(--gray)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+
+/* DASHBOARD */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:14px;text-align:center}
+.kpi .num{font-size:28px;font-weight:800;color:var(--mid-blue)}
+.kpi .lbl{font-size:11px;color:var(--gray-dark);margin-top:2px}
+.kpi.grn .num{color:var(--dark-grn)}
+.kpi.yel .num{color:var(--dark-yel)}
+.kpi.red .num{color:var(--dark-red)}
+
+/* CHART */
+.chart-wrap{position:relative;height:280px;width:100%}
+.chart-tabs{display:flex;gap:4px;margin-bottom:8px}
+.chart-tab{padding:5px 12px;border:1.5px solid #CBD5E1;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;background:#fff;color:var(--gray-dark)}
+.chart-tab.active{background:var(--mid-blue);color:#fff;border-color:var(--mid-blue)}
+
+/* pH TABS */
+.ph-tabs{display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(--light-blue)}
+.ph-tab{padding:8px 18px;cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-dark);border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
+.ph-tab:hover{color:var(--mid-blue)}
+.ph-tab.active{color:var(--mid-blue);border-bottom-color:var(--mid-blue)}
+
+/* FORMULATION */
+.formula-header{display:flex;align-items:center;gap:10px;background:var(--dark-blue);color:#fff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:12px;font-weight:700}
+.trial-count{background:var(--mid-blue);color:#fff;padding:2px 8px;border-radius:10px;font-size:11px}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;background:#1E293B;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;transform:translateY(60px);opacity:0;transition:.3s;z-index:9999;max-width:320px}
+#toast.show{transform:translateY(0);opacity:1}
+
+/* RESPONSIVE */
+@media(max-width:768px){#sidebar{display:none}#main{margin-left:0}}
+
+/* PROCESS PAGE */
+.process-batch-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.proc-tab{padding:6px 14px;border:1.5px solid #CBD5E1;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;background:#fff;color:var(--gray-dark);transition:.15s}
+.proc-tab:hover{background:var(--light-blue);border-color:var(--mid-blue);color:var(--dark-blue)}
+.proc-tab.active{background:var(--dark-blue);color:#fff;border-color:var(--dark-blue)}
+.proc-tab.has-data{border-color:var(--dark-grn);color:var(--dark-grn)}
+.proc-tab.has-data.active{background:var(--dark-grn);color:#fff}
+.proc-panel{display:none}
+.proc-panel.active{display:block}
+.coating-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+
+/* P2 PREVIEW */
+#p2-preview-wrap{max-height:620px;overflow-y:auto;background:#fff;border:1px solid #ddd;border-radius:6px;padding:28px 32px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.7;color:#1a1a1a}
+#p2-preview-wrap h3{font-size:15px;font-weight:700;margin:20px 0 6px;color:#000;border-bottom:1.5px solid #555;padding-bottom:3px}
+#p2-preview-wrap h4{font-size:13.5px;font-weight:700;margin:14px 0 5px;color:#1F3864}
+#p2-preview-wrap h5{font-size:12.5px;font-weight:700;margin:10px 0 4px;color:#2E75B6;font-style:italic}
+#p2-preview-wrap p{margin:6px 0}
+#p2-preview-wrap table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0;font-family:Arial,sans-serif}
+#p2-preview-wrap table th{background:#1F3864;color:#fff;padding:6px 8px;text-align:left;font-weight:600}
+#p2-preview-wrap table td{padding:5px 8px;border:1px solid #ccc}
+#p2-preview-wrap table tr:nth-child(even) td{background:#f9f9f9}
+#p2-preview-wrap .tbl-num{font-style:italic;font-size:11.5px;color:#555;margin-top:-4px;margin-bottom:8px}
+#p2-preview-wrap .empty-note{color:#aaa;font-style:italic;font-size:12px}
+#p2-preview-wrap .f2-pass{color:#166534;font-weight:700}
+#p2-preview-wrap .f2-fail{color:#991B1B;font-weight:700}
+
+
+
+/* MOL SEARCH */
+.mol-search-bar{display:flex;gap:8px;margin-bottom:14px;align-items:center}
+.mol-search-bar input{flex:1;padding:10px 14px;border:2px solid var(--mid-blue);border-radius:8px;font-size:14px;font-family:inherit}
+.mol-search-bar input:focus{outline:none;border-color:var(--dark-blue);background:#F0F7FF}
+.search-btn{padding:10px 20px;background:var(--mid-blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;transition:.15s}
+.search-btn:hover{background:var(--dark-blue)}
+.search-btn:disabled{background:#94a3b8;cursor:wait}
+.search-status{font-size:12px;padding:8px 12px;border-radius:6px;margin-bottom:10px;display:none}
+.search-status.loading{display:block;background:var(--accent);color:var(--dark-blue);border:1px solid var(--light-blue)}
+.search-status.success{display:block;background:var(--light-grn);color:var(--dark-grn);border:1px solid #A7D7B5}
+.search-status.error{display:block;background:var(--light-red);color:var(--dark-red);border:1px solid #F5B8B8}
+.field-filled{background:#E8F9EE!important;border-color:#4ADE80!important;transition:.4s}
+
+/* LIT & PATENT PANEL */
+#lit-panel{display:none;margin-top:16px}
+#lit-panel.visible{display:block}
+.lit-section{background:#fff;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:12px;overflow:hidden}
+.lit-section-hdr{background:var(--dark-blue);color:#fff;padding:10px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.lit-section-hdr.purple{background:var(--purple)}
+.lit-section-hdr.grn{background:var(--dark-grn)}
+.lit-section-hdr.yel{background:var(--dark-yel)}
+.lit-section-body{padding:14px 16px}
+.paper-item{padding:8px 0;border-bottom:1px solid #F1F5F9}
+.paper-item:last-child{border-bottom:none}
+.paper-title{font-size:12px;font-weight:600;color:var(--dark-blue);margin-bottom:2px}
+.paper-meta{font-size:11px;color:var(--gray-dark)}
+.paper-link{font-size:11px;color:var(--mid-blue);text-decoration:none}
+.patent-item{padding:8px 0;border-bottom:1px solid #F1F5F9}
+.patent-item:last-child{border-bottom:none}
+.patent-title{font-size:12px;font-weight:600;color:#4B0082;margin-bottom:2px}
+.patent-meta{font-size:11px;color:var(--gray-dark)}
+.formula-suggest-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.suggest-card{border:1px solid #E2E8F0;border-radius:8px;padding:12px;background:#F8FAFF}
+.suggest-card h5{font-size:12px;font-weight:700;color:var(--dark-blue);margin:0 0 6px;text-transform:uppercase;letter-spacing:.5px}
+.suggest-card ul{margin:0;padding-left:16px;font-size:11.5px;color:var(--text);line-height:1.8}
+.suggest-card .method-badge{display:inline-block;background:var(--light-grn);color:var(--dark-grn);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:6px}
+.apply-formula-btn{width:100%;margin-top:10px;padding:8px;background:var(--dark-grn);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700}
+.apply-formula-btn:hover{background:#0F3D25}
+.lit-search-btn{padding:10px 20px;background:#4B0082;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;transition:.15s;margin-left:8px}
+.lit-search-btn:hover{background:#3B0072}
+.lit-search-btn:disabled{background:#94a3b8;cursor:wait}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+
+/* EXEC SUMMARY */
+#exec-preview{max-height:700px;overflow-y:auto;background:#fff;border:1px solid #ddd;border-radius:6px;padding:32px 36px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.75;color:#111}
+#exec-preview h2{font-size:18px;font-weight:700;margin:0 0 4px;color:#1F3864}
+#exec-preview .doc-subtitle{font-size:12px;color:#666;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #1F3864}
+#exec-preview h3{font-size:14px;font-weight:700;margin:22px 0 6px;color:#1F3864;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid #D6E4F0;padding-bottom:3px}
+#exec-preview h4{font-size:13px;font-weight:700;margin:12px 0 4px;color:#2E75B6}
+#exec-preview p{margin:5px 0;font-size:13px}
+#exec-preview table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0;font-family:Arial,sans-serif}
+#exec-preview table th{background:#1F3864;color:#fff;padding:6px 10px;text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+#exec-preview table td{padding:6px 10px;border:1px solid #E2E8F0}
+#exec-preview table tr:nth-child(even) td{background:#F8FAFF}
+#exec-preview .risk-H{background:#FFE0E0;color:#7B1515;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+#exec-preview .risk-M{background:#FFF2CC;color:#7F6000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+#exec-preview .risk-L{background:#E2EFDA;color:#1A5C38;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+#exec-preview .exec-empty{color:#aaa;font-style:italic;font-size:12px}
+.exec-section-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+
+/* PRINT */
+@media print{
+  #sidebar,.page-header,.btn-row,.kpi-grid,
+  #page-p2 .card-header,
+  .save-btn,#toast{display:none!important}
+  #p2-preview-wrap{max-height:none!important;overflow:visible!important;border:none!important;padding:0!important}
+  #page-p2{display:block!important}
+  body{font-size:12pt}
+}
+
+
+/* ── PROJECT MANAGER ─────────────────────────────────────── */
+#proj-manager{
+  position:fixed;inset:0;background:#0F172A;z-index:9999;
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+#proj-manager.hidden{display:none}
+#proj-manager .pm-header{
+  background:linear-gradient(135deg,#1E3A5F 0%,#1F3864 100%);
+  padding:24px 40px 20px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;
+}
+#proj-manager .pm-logo{color:#fff}
+#proj-manager .pm-logo h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.5px}
+#proj-manager .pm-logo small{font-size:12px;color:#94A3B8}
+#proj-manager .pm-body{flex:1;padding:32px 40px;max-width:1100px;width:100%;margin:0 auto;box-sizing:border-box}
+#proj-manager .pm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+#proj-manager .pm-title{color:#fff;font-size:20px;font-weight:600;margin:0}
+#proj-manager .pm-subtitle{color:#94A3B8;font-size:13px;margin:4px 0 0}
+.pm-new-btn{
+  background:linear-gradient(135deg,#2E75B6,#1F3864);color:#fff;border:none;
+  padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:8px;transition:.2s;box-shadow:0 2px 8px rgba(46,117,182,.4);
+}
+.pm-new-btn:hover{background:linear-gradient(135deg,#3B82C4,#2E4F8A);transform:translateY(-1px)}
+.pm-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.pm-card{
+  background:#1E293B;border:1px solid #334155;border-radius:12px;
+  padding:22px 24px;cursor:pointer;transition:.2s;position:relative;
+  display:flex;flex-direction:column;
+}
+.pm-card:hover{border-color:#2E75B6;background:#243045;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.pm-card-name{color:#F1F5F9;font-size:17px;font-weight:700;margin:0 0 4px;padding-right:32px}
+.pm-card-api{color:#60A5FA;font-size:13px;font-weight:500;margin:0 0 12px}
+.pm-card-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.pm-card-tag{background:#0F172A;color:#94A3B8;font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid #334155}
+.pm-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:14px;border-top:1px solid #334155}
+.pm-card-date{color:#64748B;font-size:11px}
+.pm-open-btn{
+  background:#2E75B6;color:#fff;border:none;padding:7px 16px;
+  border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:.2s;
+}
+.pm-open-btn:hover{background:#3B82F6}
+.pm-del-btn{
+  position:absolute;top:14px;right:14px;background:transparent;border:none;
+  color:#475569;cursor:pointer;font-size:15px;padding:4px;border-radius:4px;transition:.15s;
+}
+.pm-del-btn:hover{color:#EF4444;background:rgba(239,68,68,.1)}
+.pm-empty{
+  grid-column:1/-1;text-align:center;padding:80px 20px;color:#475569;
+}
+.pm-empty .em-icon{font-size:56px;margin-bottom:16px}
+.pm-empty h3{color:#94A3B8;font-size:18px;font-weight:600;margin:0 0 8px}
+.pm-empty p{font-size:14px;margin:0}
+
+/* New project modal */
+#pm-modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;
+  display:flex;align-items:center;justify-content:center;
+}
+#pm-modal-overlay.hidden{display:none}
+.pm-modal{
+  background:#1E293B;border:1px solid #334155;border-radius:14px;
+  padding:32px;width:480px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.5);
+}
+.pm-modal h3{color:#F1F5F9;font-size:18px;font-weight:700;margin:0 0 4px}
+.pm-modal .pm-modal-sub{color:#94A3B8;font-size:13px;margin:0 0 24px}
+.pm-modal-field{margin-bottom:16px}
+.pm-modal-field label{display:block;color:#CBD5E1;font-size:12px;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.pm-modal-field input,.pm-modal-field select{
+  width:100%;box-sizing:border-box;background:#0F172A;border:1.5px solid #334155;
+  color:#F1F5F9;padding:9px 12px;border-radius:7px;font-size:13px;outline:none;
+}
+.pm-modal-field input:focus,.pm-modal-field select:focus{border-color:#2E75B6}
+.pm-modal-field select option{background:#1E293B}
+.pm-modal-btns{display:flex;gap:12px;margin-top:24px;justify-content:flex-end}
+.pm-modal-btns button{padding:9px 20px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.pm-btn-cancel{background:#334155;color:#CBD5E1}
+.pm-btn-cancel:hover{background:#475569}
+.pm-btn-create{background:#2E75B6;color:#fff}
+.pm-btn-create:hover{background:#3B82F6}
+
+/* Hide app until project loaded */
+body.no-project #sidebar,body.no-project #main{display:none!important}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ PROJECT MANAGER ══ -->
+<div id="proj-manager">
+  <div class="pm-header">
+    <div class="pm-logo">
+      <h1>⚗️ FormDev</h1>
+      <small>Farmasötik Formülasyon Geliştirme Platformu</small>
+    </div>
+  </div>
+  <div class="pm-body">
+    <div class="pm-top">
+      <div>
+        <h2 class="pm-title">Projelerim</h2>
+        <p class="pm-subtitle">Devam etmek istediğiniz projeyi seçin veya yeni bir proje oluşturun.</p>
+      </div>
+      <button class="pm-new-btn" onclick="openNewProjectModal()">
+        <span>＋</span> Yeni Proje Oluştur
+      </button>
+    </div>
+    <div class="pm-cards" id="pm-cards-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- New Project Modal -->
+<div id="pm-modal-overlay" class="hidden">
+  <div class="pm-modal">
+    <h3>Yeni Proje Oluştur</h3>
+    <p class="pm-modal-sub">Temel bilgileri girin — her şeyi proje içinde düzenleyebilirsiniz.</p>
+    <div class="pm-modal-field">
+      <label>Proje / Ürün Adı *</label>
+      <input id="pm-new-name" placeholder="örn: Ibuprofen 400 mg Film Kaplı Tablet" autofocus>
+    </div>
+    <div class="pm-modal-field">
+      <label>API (Etkin Madde)</label>
+      <input id="pm-new-api" placeholder="örn: Ibuprofen">
+    </div>
+    <div class="pm-modal-field">
+      <label>Doz Formu</label>
+      <select id="pm-new-dosage">
+        <option>Film Kaplı Tablet</option>
+        <option>Tablet</option>
+        <option>Kapsül</option>
+        <option>Oral Süspansiyon</option>
+        <option>Enjektabl</option>
+        <option>Diğer</option>
+      </select>
+    </div>
+    <div class="pm-modal-field">
+      <label>Güç / Strength</label>
+      <input id="pm-new-strength" placeholder="örn: 400 mg">
+    </div>
+    <div class="pm-modal-field">
+      <label>Sorumlu</label>
+      <input id="pm-new-owner" placeholder="Ad Soyad">
+    </div>
+    <div class="pm-modal-btns">
+      <button class="pm-btn-cancel" onclick="closeNewProjectModal()">İptal</button>
+      <button class="pm-btn-create" onclick="createNewProject()">Proje Oluştur →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="logo">
+    <h1>⚗️ FormDev</h1>
+    <small id="sidebar-proj-name" style="display:block;color:#60A5FA;font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Proje yükleniyor…</small>
+  </div>
+  <nav>
+    <div class="nav-group">Pre-Formülasyon</div>
+    <div class="nav-item" onclick="showPage('exec')"><span class="icon">🔬</span>Pre-Formülasyon</div>
+    <div class="nav-group">Genel</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span>Dashboard</div>
+    <div class="nav-group">Referans Ürün</div>
+    <div class="nav-item" onclick="showPage('ref-char')"><span class="icon">🔵</span>Karakterizasyon</div>
+    <div class="nav-item" onclick="showPage('ref-diss')"><span class="icon">🔵</span>Dissolüsyon Profili</div>
+    <div class="nav-group">Geliştirme</div>
+    <div class="nav-item" onclick="showPage('dev-phys')"><span class="icon">🟢</span>Fiziksel Analizler</div>
+    <div class="nav-item" onclick="showPage('dev-chem')"><span class="icon">🟢</span>Kimyasal Analizler</div>
+    <div class="nav-group">Formülasyon</div>
+    <div class="nav-item" onclick="showPage('formula')"><span class="icon">🟡</span>Birim Formül</div>
+    <div class="nav-group">Karşılaştırma</div>
+    <div class="nav-item" onclick="showPage('f2')"><span class="icon">🔴</span>f1 / f2 Hesabı</div>
+    <div class="nav-group">Üretim</div>
+    <div class="nav-item" onclick="showPage('process')"><span class="icon">🔧</span>Üretim Yöntemi</div>
+    <div class="nav-group">Ruhsat</div>
+    <div class="nav-item" onclick="showPage('p2')"><span class="icon">📄</span>CTD 3.2.P.2</div>
+    <div class="nav-item" onclick="showPage('translate')"><span class="icon">🌐</span>Belge Çevirisi</div>
+  </nav>
+  <div class="bottom">
+    <button class="save-btn" onclick="saveAll()">💾 Kaydet</button>
+    <div style="text-align:center;margin-top:8px;font-size:10px;color:#64748B" id="save-status">Otomatik kayıt aktif</div>
+    <button onclick="returnToProjectManager()" style="margin-top:10px;width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#94A3B8;padding:7px;border-radius:6px;font-size:11px;cursor:pointer;transition:.15s" onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">
+      ← Tüm Projeler
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+<!-- ═══════════════════════════════════════════════════════ DASHBOARD ══════ -->
+<div id="page-dashboard" class="page">
+  <div class="page-header">
+    <h2>📊 Dashboard — Proje Özeti</h2>
+    <span class="badge" id="project-badge">Proje yükleniyor…</span>
+  </div>
+  <div class="content">
+    <div class="kpi-grid" id="kpi-grid"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-header">Proje Bilgileri</div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group"><label>Ürün Adı</label><input id="p-name" placeholder="Ürün adını girin" oninput="autoSave()"></div>
+            <div class="form-group"><label>API(ler)</label><input id="p-api" placeholder="API adları" oninput="autoSave()"></div>
+            <div class="form-group"><label>Doz Formu</label><input id="p-dosage" value="Film Kaplı Tablet" oninput="autoSave()"></div>
+            <div class="form-group"><label>Güç / Strength</label><input id="p-strength" placeholder="örn: 400 mg" oninput="autoSave()"></div>
+            <div class="form-group"><label>Proje Kodu</label><input id="p-code" placeholder="PRJ-001" oninput="autoSave()"></div>
+            <div class="form-group"><label>Sorumlu</label><input id="p-owner" placeholder="Ad Soyad" oninput="autoSave()"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header blue">Referans Ürün Bilgileri</div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group"><label>Referans Ürün Adı</label><input id="r-name" placeholder="Orijinator ürün" oninput="autoSave()"></div>
+            <div class="form-group"><label>Ruhsat Sahibi</label><input id="r-holder" placeholder="Firma adı" oninput="autoSave()"></div>
+            <div class="form-group"><label>Seri No</label><input id="r-batch" placeholder="Batch no" oninput="autoSave()"></div>
+            <div class="form-group"><label>SKT</label><input id="r-exp" placeholder="MM/YYYY" oninput="autoSave()"></div>
+            <div class="form-group"><label>Dissolüsyon Limiti</label><input id="r-diss-limit" placeholder="örn: NLT %85 — 15. dak" oninput="autoSave()"></div>
+            <div class="form-group"><label>Compendial Standard</label><input id="r-standard" value="Ph.Eur." oninput="autoSave()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">Son Geliştirme Batch'leri — Özet</div>
+      <div class="card-body">
+        <div id="batch-summary-table"><p style="color:var(--gray-dark);font-size:13px">Geliştirme aşaması verisi girilince burada özetlenir.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ RUHSAT P2 ══ -->
+<div id="page-p2" class="page" style="display:none">
+  <div class="page-header">
+    <h2>📄 CTD 3.2.P.2 — Farmasötik Geliştirme</h2>
+    <span class="badge">Otomatik oluşturulur</span>
+  </div>
+  <div class="content">
+    <div class="card" id="p2-live-card">
+      <div class="card-header" style="background:#374151;display:flex;align-items:center;justify-content:space-between">
+        <span>📄 3.2.P.2 Live Preview — CTD Module 3</span>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="window.print()">🖨️ Yazdır / Word'e Aktar</button>
+      </div>
+      <div class="card-body" style="padding:12px">
+        <div id="p2-preview-wrap"><p class="empty-note">Proje bilgileri ve formülasyon verisi girildiğinde doküman otomatik oluşur.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ BELGE ÇEVİRİSİ ══ -->
+<div id="page-translate" class="page" style="display:none">
+  <div class="page-header">
+    <h2>🌐 Regüle Belge Çevirisi</h2>
+    <span class="badge">ICH · USP · Ph.Eur. · JP · BP</span>
+  </div>
+  <div class="content">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+      <!-- SOL: Kaynak Belge -->
+      <div>
+        <div class="card">
+          <div class="card-header blue">📂 Kaynak Belge (.docx)</div>
+          <div class="card-body">
+            <div class="tr-upload-zone" id="tr-upload-zone" onclick="document.getElementById('tr-file-input').click()"
+              ondragover="event.preventDefault();this.classList.add('dragover')"
+              ondragleave="this.classList.remove('dragover')"
+              ondrop="event.preventDefault();this.classList.remove('dragover');handleDocxDrop(event)">
+              <div class="up-icon">📄</div>
+              <p><strong>Word dosyası seçin veya sürükleyin</strong></p>
+              <p class="up-hint">.docx formatı desteklenir</p>
+            </div>
+            <input type="file" id="tr-file-input" accept=".docx" style="display:none" onchange="handleDocxSelect(this)">
+            <div id="tr-file-info" style="margin-top:8px;font-size:12px;color:#60A5FA;display:none"></div>
+
+            <div style="margin-top:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <span class="section-title" style="margin:0">Çıkarılan Metin</span>
+                <span class="tr-word-count" id="tr-src-count"></span>
+              </div>
+              <div class="tr-extracted" id="tr-extracted-text">Belge yüklendikten sonra metin burada görünür.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terminoloji Referansı -->
+        <div class="card" style="margin-top:0">
+          <div class="card-header" style="background:#1E293B">📚 Seçili Standart Terminolojisi</div>
+          <div class="card-body" style="padding:10px">
+            <div id="tr-glossary-panel" style="color:#64748B;font-size:12px;font-style:italic">
+              Standart seçilince anahtar terimler burada görünür.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAĞ: Ayarlar + Çıktı -->
+      <div>
+        <div class="card">
+          <div class="card-header green">⚙️ Çeviri Ayarları</div>
+          <div class="card-body">
+
+            <div class="tr-lang-select">
+              <div class="form-group" style="margin:0">
+                <label>Kaynak Dil</label>
+                <select id="tr-src-lang" style="width:100%">
+                  <option value="en">🇬🇧 İngilizce</option>
+                  <option value="tr">🇹🇷 Türkçe</option>
+                  <option value="de">🇩🇪 Almanca</option>
+                  <option value="fr">🇫🇷 Fransızca</option>
+                  <option value="es">🇪🇸 İspanyolca</option>
+                  <option value="it">🇮🇹 İtalyanca</option>
+                  <option value="ja">🇯🇵 Japonca</option>
+                  <option value="zh">🇨🇳 Çince</option>
+                </select>
+              </div>
+              <div class="tr-arrow">→</div>
+              <div class="form-group" style="margin:0">
+                <label>Hedef Dil</label>
+                <select id="tr-tgt-lang" style="width:100%">
+                  <option value="tr">🇹🇷 Türkçe</option>
+                  <option value="en">🇬🇧 İngilizce</option>
+                  <option value="de">🇩🇪 Almanca</option>
+                  <option value="fr">🇫🇷 Fransızca</option>
+                  <option value="es">🇪🇸 İspanyolca</option>
+                  <option value="it">🇮🇹 İtalyanca</option>
+                  <option value="ja">🇯🇵 Japonca</option>
+                  <option value="zh">🇨🇳 Çince (Basitleştirilmiş)</option>
+                  <option value="ko">🇰🇷 Korece</option>
+                  <option value="pt">🇧🇷 Portekizce</option>
+                  <option value="ar">🇸🇦 Arapça</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:10px">
+              <label>Regülasyon Standardı</label>
+              <div class="tr-std-btns" id="tr-std-btns">
+                <button class="tr-std-btn active" data-std="ICH" onclick="selectStd(this)">ICH</button>
+                <button class="tr-std-btn" data-std="USP" onclick="selectStd(this)">USP/NF</button>
+                <button class="tr-std-btn" data-std="EP" onclick="selectStd(this)">Ph.Eur.</button>
+                <button class="tr-std-btn" data-std="JP" onclick="selectStd(this)">JP</button>
+                <button class="tr-std-btn" data-std="BP" onclick="selectStd(this)">BP</button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:10px">
+              <label>Çeviri Motoru</label>
+              <select id="tr-engine" onchange="toggleApiKey()">
+                <option value="mymemory">MyMemory (Ücretsiz — API anahtarı gerekmez)</option>
+                <option value="deepl">DeepL (API anahtarı gerekir — yüksek kalite)</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="tr-apikey-row" style="margin-bottom:10px;display:none">
+              <label>DeepL API Anahtarı</label>
+              <div class="apikey-row">
+                <input type="password" id="tr-apikey" placeholder="DeepL Free API key…" oninput="localStorage.setItem('formdev_deepl_key',this.value)">
+                <button class="btn btn-sm" onclick="document.getElementById('tr-apikey').type==='password'?document.getElementById('tr-apikey').type='text':document.getElementById('tr-apikey').type='password'">👁</button>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:16px">
+              <button class="btn" style="flex:1;background:#2E75B6;color:#fff;font-weight:600;padding:10px" onclick="startTranslation()">
+                🌐 Çeviriyi Başlat
+              </button>
+              <button class="btn" style="background:#1E293B;color:#94A3B8;padding:10px" onclick="clearTranslation()">
+                ✕ Temizle
+              </button>
+            </div>
+
+            <div class="tr-progress" id="tr-progress"><div class="tr-progress-bar" id="tr-progress-bar" style="width:0%"></div></div>
+            <div class="tr-status-msg" id="tr-status-msg"></div>
+          </div>
+        </div>
+
+        <!-- Çeviri Çıktısı -->
+        <div class="card">
+          <div class="card-header" style="background:#374151;display:flex;align-items:center;justify-content:space-between">
+            <span>📝 Çeviri Çıktısı</span>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff" onclick="copyTranslation()">📋 Kopyala</button>
+              <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff" onclick="exportTranslation()">🖨️ Dışa Aktar</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <span id="tr-output-label" style="font-size:11px;color:#64748B"></span>
+              <span class="tr-word-count" id="tr-tgt-count"></span>
+            </div>
+            <div class="tr-output" id="tr-output" contenteditable="true" spellcheck="false"
+              oninput="updateTgtCount()">
+              <span style="color:#aaa;font-style:italic">Çeviri burada görünecek. Çıktıyı doğrudan düzenleyebilirsiniz.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ REF KARAKTERİZASYON ══════ -->
+<div id="page-ref-char" class="page" style="display:none">
+  <div class="page-header">
+    <h2>🔵 Referans Ürün — Fizikokimyasal Karakterizasyon</h2>
+    <span class="badge">10 ölçüm → otomatik istatistik</span>
+  </div>
+  <div class="content" id="ref-char-content"></div>
+</div>
+
+<!-- ═════════════════════════════════════════════════ REF DİSSÜLÜSYON ══════ -->
+<div id="page-ref-diss" class="page" style="display:none">
+  <div class="page-header">
+    <h2>🔵 Referans Ürün — Dissolüsyon Profilleri</h2>
+    <span class="badge">pH 1.2 · 4.5 · 6.8 · 12 tablet · IR</span>
+  </div>
+  <div class="content">
+    <div class="ph-tabs">
+      <div class="ph-tab active" onclick="switchDissTab('ref','ph12',this)">pH 1.2</div>
+      <div class="ph-tab" onclick="switchDissTab('ref','ph45',this)">pH 4.5</div>
+      <div class="ph-tab" onclick="switchDissTab('ref','ph68',this)">pH 6.8</div>
+    </div>
+    <div id="ref-diss-ph12" class="diss-panel"></div>
+    <div id="ref-diss-ph45" class="diss-panel" style="display:none"></div>
+    <div id="ref-diss-ph68" class="diss-panel" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ GEL FİZİKSEL ══════════════ -->
+<div id="page-dev-phys" class="page" style="display:none">
+  <div class="page-header">
+    <h2>🟢 Geliştirme — Fiziksel Analizler</h2>
+    <span class="badge" id="dev-phys-badge">— batch</span>
+  </div>
+  <div class="content" id="dev-phys-content"></div>
+</div>
+
+<!-- ════════════════════════════════════════════ GEL KİMYASAL ══════════════ -->
+<div id="page-dev-chem" class="page" style="display:none">
+  <div class="page-header">
+    <h2>🟢 Geliştirme — Kimyasal / Analitik Analizler</h2>
+    <span class="badge" id="dev-chem-badge">— batch</span>
+  </div>
+  <div class="content" id="dev-chem-content"></div>
+</div>
+
+<!-- ════════════════════════════════════════════ BİRİM FORMÜL ══════════════ -->
+<div id="page-formula" class="page" style="display:none">
+  <div class="page-header">
+    <h2>🟡 Formülasyon — Birim Formül</h2>
+    <span class="badge">mg/tablet otomatik hesaplanır</span>
+  </div>
+  <div class="content" id="formula-content"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════ f1/f2 ══════════════════ -->
+<div id="page-f2" class="page" style="display:none">
+  <div class="page-header">
+    <h2>🔴 f1 / f2 — Benzerlik Faktörü</h2>
+    <span class="badge">EMA kılavuzuna uygun hesaplama</span>
+  </div>
+  <div class="content">
+    <div class="ph-tabs">
+      <div class="ph-tab active" onclick="switchF2Tab('ph12',this)">pH 1.2</div>
+      <div class="ph-tab" onclick="switchF2Tab('ph45',this)">pH 4.5</div>
+      <div class="ph-tab" onclick="switchF2Tab('ph68',this)">pH 6.8</div>
+    </div>
+    <div id="f2-ph12" class="f2-panel"></div>
+    <div id="f2-ph45" class="f2-panel" style="display:none"></div>
+    <div id="f2-ph68" class="f2-panel" style="display:none"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════ ÜRETİM YÖNTEMİ ═══════════ -->
+<div id="page-process" class="page" style="display:none">
+  <div class="page-header">
+    <h2>🔧 Üretim Yöntemi — Batch Detayları</h2>
+    <span class="badge">D001 – D008</span>
+  </div>
+  <div class="content">
+    <div class="process-batch-tabs" id="proc-tabs"></div>
+    <div id="proc-panels"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ YÖNETİCİ ÖZETİ ════ -->
+<div id="page-exec" class="page" style="display:none">
+  <div class="page-header">
+    <h2>🔬 Pre-Formülasyon Çalışması</h2>
+    <span class="badge">Otomatik rapor üretilir</span>
+  </div>
+  <div class="content">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+      <!-- SOL KOLON: Giriş formları -->
+      <div>
+
+        <!-- MOLEKÜl -->
+        <div class="card">
+          <div class="card-header blue">🧬 API / Molekül Bilgileri</div>
+          <div class="card-body">
+            <div class="mol-search-bar">
+              <input id="ex-mol-name" placeholder="Molekül adı girin (INN veya ticari ad) — örn: ibuprofen, metformin…" oninput="updateExec('mol','name',this.value)" onkeydown="if(event.key==='Enter')searchMolecule()">
+              <button class="search-btn" id="mol-search-btn" onclick="searchMolecule()">🔍 Molekül Araştır</button>
+              <button class="lit-search-btn" id="lit-search-btn" onclick="searchLiteratureAndPatents()">📚 Literatür & Patent</button>
+            </div>
+            <div id="mol-search-status" class="search-status"></div>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr">
+              <div style="display:none"><label>API Adı (INN)</label><input id="ex-mol-name-hidden"></div>
+              <div class="form-group"><label>Kimyasal Ad</label><input id="ex-mol-chem" placeholder="IUPAC adı" oninput="updateExec('mol','chem',this.value)"></div>
+              <div class="form-group"><label>Molekül Formülü</label><input id="ex-mol-formula" placeholder="C₁₃H₁₈O₂" oninput="updateExec('mol','formula',this.value)"></div>
+              <div class="form-group"><label>Molekül Ağırlığı (g/mol)</label><input type="number" id="ex-mol-mw" placeholder="206.28" oninput="updateExec('mol','mw',this.value)"></div>
+              <div class="form-group"><label>BCS Sınıfı</label>
+                <select id="ex-mol-bcs" onchange="updateExec('mol','bcs',this.value)">
+                  <option value="">Seçin</option>
+                  <option>Sınıf I — Yüksek çözünürlük, yüksek geçirgenlik</option>
+                  <option>Sınıf II — Düşük çözünürlük, yüksek geçirgenlik</option>
+                  <option>Sınıf III — Yüksek çözünürlük, düşük geçirgenlik</option>
+                  <option>Sınıf IV — Düşük çözünürlük, düşük geçirgenlik</option>
+                </select>
+              </div>
+              <div class="form-group"><label>pKa</label><input id="ex-mol-pka" placeholder="4.91" oninput="updateExec('mol','pka',this.value)"></div>
+              <div class="form-group"><label>logP</label><input id="ex-mol-logp" placeholder="3.97" oninput="updateExec('mol','logp',this.value)"></div>
+              <div class="form-group"><label>Erime Noktası (°C)</label><input id="ex-mol-mp" placeholder="76" oninput="updateExec('mol','mp',this.value)"></div>
+            </div>
+            <div class="section-title">Suda Çözünürlük</div>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr">
+              <div class="form-group"><label>pH 1.2 (mg/mL)</label><input type="number" step="0.001" id="ex-mol-sol12" oninput="updateExec('mol','sol12',this.value)"></div>
+              <div class="form-group"><label>pH 4.5 (mg/mL)</label><input type="number" step="0.001" id="ex-mol-sol45" oninput="updateExec('mol','sol45',this.value)"></div>
+              <div class="form-group"><label>pH 6.8 (mg/mL)</label><input type="number" step="0.001" id="ex-mol-sol68" oninput="updateExec('mol','sol68',this.value)"></div>
+            </div>
+            <!-- KATI HAL -->
+            <div class="section-title" style="margin-top:10px">Katı Hal & Fiziksel Özellikler</div>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr">
+              <div class="form-group"><label>Polimorfik Form</label>
+                <input id="ex-mol-poly" placeholder="Form I, amorf, hidrat..." oninput="updateExec('mol','poly',this.value)">
+              </div>
+              <div class="form-group"><label>Higroskopiklik</label>
+                <select id="ex-mol-hygro" onchange="updateExec('mol','hygro',this.value)">
+                  <option value="">Seçin</option>
+                  <option>Düşük (&lt;0.2% nem alımı)</option>
+                  <option>Orta (0.2–2%)</option>
+                  <option>Yüksek (&gt;2%)</option>
+                  <option>Deliquescent (çok yüksek)</option>
+                </select>
+              </div>
+              <div class="form-group"><label>D50 Parçacık Boyutu (µm)</label>
+                <input type="number" step="0.1" id="ex-mol-d50" placeholder="50" oninput="updateExec('mol','d50',this.value)">
+              </div>
+              <div class="form-group"><label>D90 Parçacık Boyutu (µm)</label>
+                <input type="number" step="0.1" id="ex-mol-d90" placeholder="150" oninput="updateExec('mol','d90',this.value)">
+              </div>
+              <div class="form-group"><label>Bulk Density (g/mL)</label>
+                <input type="number" step="0.01" id="ex-mol-bulkdens" placeholder="0.45" oninput="updateExec('mol','bulkdens',this.value);calcCarr()">
+              </div>
+              <div class="form-group"><label>Tapped Density (g/mL)</label>
+                <input type="number" step="0.01" id="ex-mol-tapdens" placeholder="0.60" oninput="updateExec('mol','tapdens',this.value);calcCarr()">
+              </div>
+              <div class="form-group"><label>Carr İndeksi (%)</label>
+                <input type="number" step="0.1" id="ex-mol-carr" placeholder="Otomatik hesaplanır" readonly style="background:#f8f8f8">
+              </div>
+              <div class="form-group"><label>Fotostabilite (ICH Q1B)</label>
+                <select id="ex-mol-photo" onchange="updateExec('mol','photo',this.value)">
+                  <option value="">Seçin</option>
+                  <option>Kararlı</option>
+                  <option>Hassas — ışıktan korunmalı</option>
+                  <option>Çok hassas — amber ambalaj gerekli</option>
+                  <option>Test edilmedi</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-grid" style="grid-template-columns:1fr">
+              <div class="form-group"><label>Termal Stabilite / Bozunma Notu</label>
+                <input id="ex-mol-thermal" placeholder="Örn: 200°C üzerinde bozunma, 40°C/75%RH kararlı..." oninput="updateExec('mol','thermal',this.value)">
+              </div>
+              <div class="form-group"><label>Bilinen Uyumsuz Eksipiyanlar</label>
+                <input id="ex-mol-incompat" placeholder="Örn: Mg stearat (bazik API için), oksidanlar..." oninput="updateExec('mol','incompat',this.value)">
+              </div>
+            </div>
+            <div class="form-grid" style="grid-template-columns:1fr">
+              <div class="form-group"><label>Farmakolojik Etki Mekanizması</label>
+                <textarea id="ex-mol-moa" rows="2" style="padding:7px;border:1.5px solid #CBD5E1;border-radius:6px;font-size:12px;width:100%;font-family:inherit;resize:vertical"
+                  oninput="updateExec('mol','moa',this.value)" placeholder="Etki mekanizması..."></textarea>
+              </div>
+              <div class="form-group"><label>Terapötik Endikasyon</label>
+                <textarea id="ex-mol-indication" rows="2" style="padding:7px;border:1.5px solid #CBD5E1;border-radius:6px;font-size:12px;width:100%;font-family:inherit;resize:vertical"
+                  oninput="updateExec('mol','indication',this.value)" placeholder="Onaylı endikasyon(lar)..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REFERANS ÜRÜN -->
+        <div class="card">
+          <div class="card-header">🏭 Referans Ürün — Ticari Profil</div>
+          <div class="card-body">
+            <div class="form-grid" style="grid-template-columns:1fr 1fr">
+              <div class="form-group"><label>Ticari Ad</label><input id="ex-ref-brand" oninput="updateExec('ref','brand',this.value)" placeholder="Brufen, Advil..."></div>
+              <div class="form-group"><label>Ruhsat Sahibi</label><input id="ex-ref-mah" oninput="updateExec('ref','mah',this.value)" placeholder="Firma adı"></div>
+              <div class="form-group"><label>Doz Formu</label><input id="ex-ref-form" oninput="updateExec('ref','form',this.value)" placeholder="Film kaplı tablet"></div>
+              <div class="form-group"><label>Güç (Strength)</label><input id="ex-ref-strength" oninput="updateExec('ref','strength',this.value)" placeholder="400 mg"></div>
+              <div class="form-group"><label>Ruhsat Tarihi</label><input id="ex-ref-date" oninput="updateExec('ref','date',this.value)" placeholder="YYYY"></div>
+              <div class="form-group"><label>Piyasa Durumu</label>
+                <select id="ex-ref-status" onchange="updateExec('ref','status',this.value)">
+                  <option value="">Seçin</option>
+                  <option>Aktif — piyasada mevcut</option>
+                  <option>Kısmen mevcut</option>
+                  <option>Piyasadan çekilmiş</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Referans Ülke / Prosedür</label><input id="ex-ref-country" oninput="updateExec('ref','country',this.value)" placeholder="Türkiye / EMA / FDA"></div>
+              <div class="form-group"><label>ATC Kodu</label><input id="ex-ref-atc" oninput="updateExec('ref','atc',this.value)" placeholder="M01AE01"></div>
+              <div class="form-group"><label>FDA Başvuru No (NDA / Orijinatör)</label><input id="ex-ref-appNo" oninput="updateExec('ref','appNo',this.value)" placeholder="NDA019087"></div>
+              <div class="form-group"><label>Uygulama Yolu</label><input id="ex-ref-route" oninput="updateExec('ref','route',this.value)" placeholder="Oral, IV, topikal..."></div>
+            </div>
+            <div class="form-group" style="margin-top:10px"><label>Ek Klinik / Farmakokinetik Notlar</label>
+              <textarea id="ex-ref-pk" rows="3" style="padding:7px;border:1.5px solid #CBD5E1;border-radius:6px;font-size:12px;width:100%;font-family:inherit;resize:vertical"
+                oninput="updateExec('ref','pk',this.value)" placeholder="Tmax, Cmax, yarı ömür, protein bağlanması, metabolizma..."></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /sol kolon -->
+
+      <!-- SAĞ KOLON -->
+      <div>
+
+        <!-- REGÜLATÖR / FİKRİ MÜLKİYET -->
+        <div class="card">
+          <div class="card-header red">⚖️ Regülatör & Fikri Mülkiyet Durumu</div>
+          <div class="card-body">
+            <div class="form-grid" style="grid-template-columns:1fr 1fr">
+              <div class="form-group"><label>Jenerik Ruhsat Yolu</label>
+                <select id="ex-reg-path" onchange="updateExec('reg','path',this.value)">
+                  <option value="">Seçin</option>
+                  <option>Tam Başvuru (Bölüm 8.3)</option>
+                  <option>Hibrit Başvuru (Bölüm 8.4)</option>
+                  <option>Biyo-muafiyet (Waiver)</option>
+                  <option>Bibliografik Başvuru</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Biyoeşdeğerlik Gereksinimi</label>
+                <select id="ex-reg-be" onchange="updateExec('reg','be',this.value)">
+                  <option value="">Seçin</option>
+                  <option>In vivo BE çalışması gerekli</option>
+                  <option>Biyo-muafiyet uygulanabilir (BCS I/III)</option>
+                  <option>In vitro dissolüsyon yeterli</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Patent Durumu</label>
+                <select id="ex-reg-patent" onchange="updateExec('reg','patent',this.value)">
+                  <option value="">Seçin</option>
+                  <option>Patent süresi dolmuş</option>
+                  <option>Aktif patent var</option>
+                  <option>Bilinmiyor / araştırılıyor</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Patent Bitiş Yılı</label><input id="ex-reg-patexp" oninput="updateExec('reg','patexp',this.value)" placeholder="YYYY (varsa)"></div>
+              <div class="form-group"><label>Veri Münhasıriyeti</label>
+                <select id="ex-reg-excl" onchange="updateExec('reg','excl',this.value)">
+                  <option value="">Seçin</option>
+                  <option>Sona ermiş</option>
+                  <option>Aktif (bitiş yılı belirt)</option>
+                  <option>Uygulanamaz</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Münhasiyet Bitiş</label><input id="ex-reg-exclexp" oninput="updateExec('reg','exclexp',this.value)" placeholder="YYYY (varsa)"></div>
+            </div>
+            <div class="form-group" style="margin-top:8px"><label>Rekabet Durumu / Piyasadaki Jenerikler</label>
+              <textarea id="ex-reg-competition" rows="2" style="padding:7px;border:1.5px solid #CBD5E1;border-radius:6px;font-size:12px;width:100%;font-family:inherit;resize:vertical"
+                oninput="updateExec('reg','competition',this.value)" placeholder="Mevcut jenerik sayısı, önemli rakipler..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- GELİŞTİRME STRATEJİSİ -->
+        <div class="card">
+          <div class="card-header green">🎯 Geliştirme Stratejisi</div>
+          <div class="card-body">
+            <div class="form-grid" style="grid-template-columns:1fr 1fr">
+              <div class="form-group"><label>Hedef Doz Formu</label><input id="ex-dev-form" oninput="updateExec('dev','form',this.value)" placeholder="Film kaplı tablet"></div>
+              <div class="form-group"><label>Hedef Güç</label><input id="ex-dev-strength" oninput="updateExec('dev','strength',this.value)" placeholder="400 mg"></div>
+              <div class="form-group"><label>Üretim Yöntemi</label>
+                <select id="ex-dev-method" onchange="updateExec('dev','method',this.value)">
+                  <option value="">Seçin</option>
+                  <option>Direkt Kompresyon</option>
+                  <option>Islak Granülasyon</option>
+                  <option>Kuru Granülasyon</option>
+                  <option>Pelletleme</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Hedef Pazar</label><input id="ex-dev-market" oninput="updateExec('dev','market',this.value)" placeholder="Türkiye, AB, vb."></div>
+              <div class="form-group"><label>Tahmini Geliştirme Süresi</label><input id="ex-dev-timeline" oninput="updateExec('dev','timeline',this.value)" placeholder="örn: 18 ay"></div>
+              <div class="form-group"><label>Başvuru Hedef Tarihi</label><input id="ex-dev-target" oninput="updateExec('dev','target',this.value)" placeholder="Ç3 2027"></div>
+            </div>
+            <div class="form-group" style="margin-top:8px"><label>Geliştirme Gerekçesi / Stratejik Değer</label>
+              <textarea id="ex-dev-rationale" rows="3" style="padding:7px;border:1.5px solid #CBD5E1;border-radius:6px;font-size:12px;width:100%;font-family:inherit;resize:vertical"
+                oninput="updateExec('dev','rationale',this.value)" placeholder="Neden bu ürün? Portföy içindeki yeri, ticari gerekçe, hasta ihtiyacı..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- RİSK DEĞERLENDİRMESİ -->
+        <div class="card">
+          <div class="card-header yellow">⚠️ Risk Değerlendirmesi</div>
+          <div class="card-body">
+            <div style="font-size:11px;color:var(--gray-dark);margin-bottom:8px">Her risk için seviyeyi belirtin (Y=Yüksek, O=Orta, D=Düşük)</div>
+            <table>
+              <thead><tr><th>Risk Alanı</th><th>Seviye</th><th>Açıklama / Azaltma</th></tr></thead>
+              <tbody>
+                <tr><td class="label-td">Formülasyon</td>
+                  <td><select id="ex-risk-form" onchange="updateExec('risk','form',this.value)" style="width:80px">
+                    <option value="">—</option><option value="H">Yüksek</option><option value="M">Orta</option><option value="L">Düşük</option>
+                  </select></td>
+                  <td><input id="ex-risk-form-note" oninput="updateExec('risk','form_note',this.value)" placeholder="Not..." style="width:100%"></td></tr>
+                <tr><td class="label-td">Analitik</td>
+                  <td><select id="ex-risk-anal" onchange="updateExec('risk','anal',this.value)" style="width:80px">
+                    <option value="">—</option><option value="H">Yüksek</option><option value="M">Orta</option><option value="L">Düşük</option>
+                  </select></td>
+                  <td><input id="ex-risk-anal-note" oninput="updateExec('risk','anal_note',this.value)" placeholder="Not..." style="width:100%"></td></tr>
+                <tr><td class="label-td">Regülatör</td>
+                  <td><select id="ex-risk-reg" onchange="updateExec('risk','reg',this.value)" style="width:80px">
+                    <option value="">—</option><option value="H">Yüksek</option><option value="M">Orta</option><option value="L">Düşük</option>
+                  </select></td>
+                  <td><input id="ex-risk-reg-note" oninput="updateExec('risk','reg_note',this.value)" placeholder="Not..." style="width:100%"></td></tr>
+                <tr><td class="label-td">IP / Patent</td>
+                  <td><select id="ex-risk-ip" onchange="updateExec('risk','ip',this.value)" style="width:80px">
+                    <option value="">—</option><option value="H">Yüksek</option><option value="M">Orta</option><option value="L">Düşük</option>
+                  </select></td>
+                  <td><input id="ex-risk-ip-note" oninput="updateExec('risk','ip_note',this.value)" placeholder="Not..." style="width:100%"></td></tr>
+                <tr><td class="label-td">Pazar / Rekabet</td>
+                  <td><select id="ex-risk-mkt" onchange="updateExec('risk','mkt',this.value)" style="width:80px">
+                    <option value="">—</option><option value="H">Yüksek</option><option value="M">Orta</option><option value="L">Düşük</option>
+                  </select></td>
+                  <td><input id="ex-risk-mkt-note" oninput="updateExec('risk','mkt_note',this.value)" placeholder="Not..." style="width:100%"></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /sağ kolon -->
+    </div><!-- /2-col grid -->
+
+    <!-- LİTERATÜR & PATENT PANELİ -->
+    <div id="lit-panel">
+
+      <div class="lit-section">
+        <div class="lit-section-hdr grn">📄 Bilimsel Literatür <span id="lit-paper-count" style="font-weight:400;font-size:11px;opacity:.8"></span></div>
+        <div class="lit-section-body" id="lit-papers-body"><p style="color:var(--gray-dark);font-size:12px">Literatür araştırması başlatılmadı.</p></div>
+      </div>
+
+      <div class="lit-section">
+        <div class="lit-section-hdr purple">🔒 Patent Taraması <span id="lit-patent-count" style="font-weight:400;font-size:11px;opacity:.8"></span></div>
+        <div class="lit-section-body" id="lit-patents-body"><p style="color:var(--gray-dark);font-size:12px">Patent araştırması başlatılmadı.</p></div>
+      </div>
+
+      <div class="lit-section">
+        <div class="lit-section-hdr yel">🧪 Formülasyon & Üretim Yöntemi Önerisi</div>
+        <div class="lit-section-body" id="lit-formula-body"><p style="color:var(--gray-dark);font-size:12px">Molekül araştırması tamamlandıktan sonra öneriler oluşur.</p></div>
+      </div>
+
+    </div>
+
+    <!-- YÖNETİCİ ÖZETİ ÇIKTISI -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-header" style="background:#374151;display:flex;align-items:center;justify-content:space-between">
+        <span>📄 Pre-Formülasyon Raporu — Otomatik Çıktı</span>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="printExec()">🖨️ Yazdır / Dışa Aktar</button>
+      </div>
+      <div class="card-body" style="padding:12px">
+        <div id="exec-preview"><p class="exec-empty">Formu doldurun, pre-formülasyon raporu otomatik oluşur.</p></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA STORE
+// ═══════════════════════════════════════════════════════════════════════════
+const TP = [0,5,10,15,20,30,45,60]; // time points IR
+const N_TABLETS_REF = 12;
+const N_MEAS = 10;
+const BATCH_IDS = ['D001','D002','D003','D004','D005','D006','D007','D008'];
+const PHS = ['ph12','ph45','ph68'];
+const PH_LABELS = {ph12:'pH 1.2',ph45:'pH 4.5',ph68:'pH 6.8'};
+const PH_CONDITIONS = {
+  ph12:'pH 1.2 Sodyum klorür tamponu, 900 mL, 50 rpm, Palet, 37°C±0.5°C',
+  ph45:'pH 4.5 Asetat Tamponu, 900 mL, 50 rpm, Palet, 37°C±0.5°C',
+  ph68:'pH 6.8 Fosfat Tamponu, 900 mL, 50 rpm, Palet, 37°C±0.5°C',
+};
+
+const REF_CHAR_PARAMS = [
+  {sec:'FİZİKSEL ÖZELLİKLER'},
+  {id:'appearance',label:'Görünüm',unit:'Tanım.',spec:'',type:'text'},
+  {id:'avg_weight',label:'Ortalama Ağırlık',unit:'mg',spec:''},
+  {id:'width',label:'En (Width)',unit:'mm',spec:''},
+  {id:'length',label:'Boy (Length)',unit:'mm',spec:''},
+  {id:'thickness',label:'Kalınlık (Thickness)',unit:'mm',spec:''},
+  {id:'hardness',label:'Sertlik (Hardness)',unit:'N',spec:'NLT 80 N'},
+  {id:'friability',label:'Friabilite',unit:'%',spec:'NMT 1.0%'},
+  {id:'disintegration',label:'Dağılma Süresi',unit:'dak',spec:'NMT 15 dak'},
+  {sec:'KİMYASAL ÖZELLİKLER'},
+  {id:'assay1',label:'API 1 — İçerik (Assay)',unit:'% LC',spec:'90.0–110.0%'},
+  {id:'assay2',label:'API 2 — İçerik (Assay)',unit:'% LC',spec:'90.0–110.0%'},
+  {id:'total_imp',label:'Toplam Safsızlıklar',unit:'%',spec:'NMT 1.0%'},
+  {id:'single_imp',label:'En Büyük Tek Safsızlık',unit:'%',spec:'NMT 0.5%'},
+  {id:'water',label:'Su İçeriği (KF)',unit:'%',spec:'NMT 3.0%'},
+  {sec:'BULK / PARTİKÜL ÖZELLİKLERİ'},
+  {id:'d50',label:'Partikül Boyutu D50',unit:'µm',spec:''},
+  {id:'d90',label:'Partikül Boyutu D90',unit:'µm',spec:''},
+  {id:'bulk_density',label:'Bulk Yoğunluğu',unit:'g/mL',spec:''},
+  {id:'tapped_density',label:'Tapped Yoğunluğu',unit:'g/mL',spec:''},
+  {id:'carr',label:'Carr İndeksi',unit:'%',spec:'NMT 25%'},
+  {id:'hausner',label:'Hausner Oranı',unit:'—',spec:'NMT 1.35'},
+];
+
+const DEV_PHYS_PARAMS = [
+  {id:'width',label:'En (mm)'},
+  {id:'length',label:'Boy (mm)'},
+  {id:'thickness',label:'Kalınlık (mm)'},
+  {id:'hardness',label:'Sertlik (N)'},
+  {id:'weight',label:'Ağırlık (mg)'},
+  {id:'disintegration',label:'Dağılma (dak)'},
+];
+
+const DEV_CHEM_PARAMS = [
+  {sec:'İÇERİK TAYİNİ'},
+  {id:'assay1',label:'API 1 — Assay',unit:'% LC',spec:'90.0–110.0%'},
+  {id:'assay2',label:'API 2 — Assay',unit:'% LC',spec:'90.0–110.0%'},
+  {id:'cu',label:'Tekdüzelik (AV)',unit:'—',spec:'AV ≤ 15'},
+  {sec:'SAFSIZLIKLAR'},
+  {id:'total_imp',label:'Toplam Safsızlık',unit:'%',spec:'NMT 1.0%'},
+  {id:'single_imp',label:'En Büyük Tek',unit:'%',spec:'NMT 0.5%'},
+  {sec:'DİSSÜLÜSYON pH 1.2'},
+  {id:'diss12_15',label:'Q 15 dak',unit:'%',spec:'NLT 85%'},
+  {id:'diss12_30',label:'Q 30 dak',unit:'%',spec:'NLT 85%'},
+  {id:'diss12_45',label:'Q 45 dak',unit:'%',spec:'NLT 85%'},
+  {sec:'DİSSÜLÜSYON pH 4.5'},
+  {id:'diss45_15',label:'Q 15 dak',unit:'%',spec:'NLT 85%'},
+  {id:'diss45_30',label:'Q 30 dak',unit:'%',spec:'NLT 85%'},
+  {sec:'DİSSÜLÜSYON pH 6.8'},
+  {id:'diss68_15',label:'Q 15 dak',unit:'%',spec:'NLT 85%'},
+  {id:'diss68_30',label:'Q 30 dak',unit:'%',spec:'NLT 85%'},
+  {sec:'DİĞER'},
+  {id:'water',label:'Su İçeriği (KF)',unit:'%',spec:'NMT 3.0%'},
+  {id:'ph',label:'pH',unit:'—',spec:'4.5–7.5'},
+];
+
+const DEFAULT_EXCIPIENTS = [];
+
+// Reactive state
+const ST = {
+  project: {},
+  refChar: {},      // {paramId: [v1..v10]}
+  refDiss: {},      // {ph: {tp: [v1..v12]}}
+  devPhys: {},      // {batchId: {paramId: [v1..v10]}}
+  devChem: {},      // {batchId: {paramId: value}}
+  formula: {
+    tabletWeight: 600,
+    batchSize: 5000,
+    excipients: JSON.parse(JSON.stringify(DEFAULT_EXCIPIENTS)),
+    values: {}  // {excip_idx: {batchId: pct}}
+  },
+  f2: {},           // {ph: {ref_avg: {tp:v}, test_avg: {tp:v}}}
+  exec: {
+    mol:{},   // molecule / API physicochemical data
+    ref:{},   // reference product commercial data
+    reg:{},   // regulatory & IP landscape
+    dev:{},   // development rationale & strategy
+    risk:{}   // risk assessment
+  },
+  process: {},      // {batchId: {method,batchSize,coreWt,coatedWt,description,hardness,coatPct,coatMat,inletTemp,sprayRate,panSpeed,rationale,equipment,diss:{ph:{tp:avg}}}}
+};
+
+// ── Multi-project storage ─────────────────────────────────────────────────
+let CURRENT_PROJECT_ID = null;
+
+function getProjList() {
+  try { return JSON.parse(localStorage.getItem('formdev_projects_v2') || '[]'); } catch(_){ return []; }
+}
+function saveProjList(arr) {
+  localStorage.setItem('formdev_projects_v2', JSON.stringify(arr));
+}
+function getProjData(id) {
+  try { return JSON.parse(localStorage.getItem('formdev_data_'+id) || 'null'); } catch(_){ return null; }
+}
+function saveProjData(id, data) {
+  localStorage.setItem('formdev_data_'+id, JSON.stringify(data));
+}
+function genId() {
+  return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+
+function migrateV1() {
+  const v1 = localStorage.getItem('formdev_v1');
+  if(!v1) return;
+  if(getProjList().length > 0) return; // already migrated
+  try {
+    const data = JSON.parse(v1);
+    const id = genId();
+    const meta = {
+      id,
+      name: data.project?.p_name || 'İçe aktarılan Proje',
+      api:  data.project?.p_api  || '',
+      dosage: data.project?.p_dosage || 'Film Kaplı Tablet',
+      strength: data.project?.p_strength || '',
+      owner: data.project?.p_owner || '',
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    saveProjList([meta]);
+    saveProjData(id, data);
+    console.info('FormDev: v1 data migrated to project', id);
+  } catch(e) { console.warn('Migration failed', e); }
+}
+
+function loadState() {
+  // Migration from old single-project format
+  migrateV1();
+  // Show project manager (project will be loaded via openProject)
+  document.body.classList.add('no-project');
+}
+
+function saveAll() {
+  if(!CURRENT_PROJECT_ID) return;
+  try {
+    collectAllInputs();
+    saveProjData(CURRENT_PROJECT_ID, ST);
+    // Update metadata (name, lastModified)
+    const list = getProjList();
+    const idx = list.findIndex(p => p.id === CURRENT_PROJECT_ID);
+    if(idx >= 0) {
+      list[idx].name      = ST.project.p_name     || list[idx].name;
+      list[idx].api       = ST.project.p_api      || list[idx].api;
+      list[idx].dosage    = ST.project.p_dosage   || list[idx].dosage;
+      list[idx].strength  = ST.project.p_strength || list[idx].strength;
+      list[idx].owner     = ST.project.p_owner    || list[idx].owner;
+      list[idx].lastModified = new Date().toISOString();
+      saveProjList(list);
+    }
+    toast('✓ Kaydedildi');
+    document.getElementById('save-status').textContent = 'Son kayıt: ' + new Date().toLocaleTimeString('tr-TR');
+  } catch(e) { toast('Kayıt hatası: ' + e.message, true); }
+}
+
+let autoSaveTimer;
+function autoSave() {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(saveAll, 800);
+  scheduleP2Preview();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATS HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+function nums(arr) { return arr.map(Number).filter(v => !isNaN(v) && v !== 0 && String(arr[arr.indexOf(v)]).trim() !== ''); }
+function mean(arr) { const a=nums(arr); return a.length?a.reduce((s,v)=>s+v,0)/a.length:null; }
+function std(arr) {
+  const a=nums(arr); if(a.length<2) return null;
+  const m=mean(arr); return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1));
+}
+function rsd(arr) { const m=mean(arr),s=std(arr); return m&&s?s/m*100:null; }
+function ci95(arr) {
+  const a=nums(arr); if(a.length<2) return null;
+  const t = [12.706,4.303,3.182,2.776,2.571,2.447,2.365,2.306,2.262,2.228];
+  const tval = a.length<=11 ? t[a.length-2] : 1.96;
+  return tval * std(arr) / Math.sqrt(a.length);
+}
+function fmt(v, d=2) { return v!=null ? v.toFixed(d) : '—'; }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PAGE NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).style.display='block';
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')?.includes("'"+id+"'")) n.classList.add('active');
+  });
+  renderPage(id);
+}
+
+function renderPage(id) {
+  if(id==='dashboard') renderDashboard();
+  else if(id==='ref-char') renderRefChar();
+  else if(id==='ref-diss') renderRefDiss();
+  else if(id==='dev-phys') renderDevPhys();
+  else if(id==='dev-chem') renderDevChem();
+  else if(id==='formula') renderFormula();
+  else if(id==='f2') renderF2();
+  else if(id==='process') renderProcess();
+  else if(id==='exec') renderExec();
+  else if(id==='p2')  scheduleP2Preview();
+  else if(id==='translate') initTranslatePage();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════════════════
+function renderDashboard() {
+  // Restore inputs
+  ['p-name','p-api','p-dosage','p-strength','p-code','p-owner',
+   'r-name','r-holder','r-batch','r-exp','r-diss-limit','r-standard']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      const key = id.replace(/-/g,'_');
+      if(el && ST.project[key]) el.value = ST.project[key];
+    });
+  document.getElementById('project-badge').textContent = ST.project.p_name || 'İsimsiz Proje';
+
+  // KPIs
+  const activeBatches = BATCH_IDS.filter(b => ST.devPhys[b] && Object.keys(ST.devPhys[b]).length > 0).length;
+  const refDissComplete = PHS.filter(ph => ST.refDiss[ph] && Object.keys(ST.refDiss[ph]).length > 0).length;
+  const excipCount = (ST.formula.excipients||[]).length;
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi grn"><div class="num">${activeBatches}</div><div class="lbl">Geliştirme Batch'i</div></div>
+    <div class="kpi"><div class="num">${excipCount}</div><div class="lbl">Hammadde / Excipient</div></div>
+    <div class="kpi yel"><div class="num">${refDissComplete}/3</div><div class="lbl">Dissolüsyon pH Profili</div></div>
+    <div class="kpi red"><div class="num">${ST.formula.tabletWeight||'—'}</div><div class="lbl">Hedef Tablet Ağırlığı (mg)</div></div>
+  `;
+
+  // Batch summary
+  const rows = BATCH_IDS.map(b => {
+    const phys = ST.devPhys[b];
+    const chem = ST.devChem[b];
+    if(!phys && !chem) return '';
+    const hw = phys?.hardness ? fmt(mean(Object.values(phys.hardness))) : '—';
+    const wt = phys?.weight ? fmt(mean(Object.values(phys.weight))) : '—';
+    const assay = chem?.assay1 || '—';
+    const diss = chem?.diss12_15 || '—';
+    return `<tr>
+      <td class="label-td">${b}</td>
+      <td>${wt} mg</td><td>${hw} N</td>
+      <td>${assay!='—'?assay+' %':'—'}</td>
+      <td>${diss!='—'?diss+' %':'—'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('batch-summary-table').innerHTML = rows ?
+    `<table><thead><tr><th>Batch</th><th>Ort. Ağırlık</th><th>Sertlik</th><th>Assay</th><th>Diss Q15 pH1.2</th></tr></thead><tbody>${rows}</tbody></table>` :
+    '<p style="color:var(--gray-dark);font-size:13px">Henüz geliştirme verisi girilmedi.</p>';
+
+  // P2 Live Preview
+  scheduleP2Preview();
+}
+
+function collectDashboardInputs() {
+  ['p-name','p-api','p-dosage','p-strength','p-code','p-owner',
+   'r-name','r-holder','r-batch','r-exp','r-diss-limit','r-standard']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      const key = id.replace(/-/g,'_');
+      if(el) ST.project[key] = el.value;
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REF CHARACTERIZATION
+// ═══════════════════════════════════════════════════════════════════════════
+function renderRefChar() {
+  const cont = document.getElementById('ref-char-content');
+  let html = `<div class="card"><div class="card-header blue">Referans Ürün — Fizikokimyasal Karakterizasyon</div><div class="card-body"><div class="tbl-wrap"><table>
+    <thead><tr><th class="dark" style="text-align:left;width:160px">Parametre</th><th class="dark">Birim</th>`;
+  for(let i=1;i<=N_MEAS;i++) html+=`<th>T${i}</th>`;
+  html+=`<th class="green">ORT</th><th class="green">SD</th><th class="green">RSD%</th><th class="green">G.A.%95</th><th class="green">ALT</th><th class="green">ÜST</th><th style="background:#415A77;color:#fff">SPEC</th></tr></thead><tbody>`;
+
+  REF_CHAR_PARAMS.forEach(p => {
+    if(p.sec) { html+=`<tr class="section-row"><td colspan="${11+N_MEAS}">${p.sec}</td></tr>`; return; }
+    const vals = ST.refChar[p.id] || Array(N_MEAS).fill('');
+    const isText = p.type==='text';
+    html+=`<tr><td class="label-td">${p.label}</td><td style="background:#F8FAFF;color:#64748B;font-size:11px">${p.unit}</td>`;
+    for(let i=0;i<N_MEAS;i++) {
+      html+=`<td><input type="${isText?'text':'number'}" step="0.001" value="${vals[i]||''}"
+        oninput="updateRefChar('${p.id}',${i},this.value)" style="width:70px"></td>`;
+    }
+    if(isText) {
+      html+=`<td class="stat" colspan="6">${vals[0]||'—'}</td>`;
+    } else {
+      const m=mean(vals),s=std(vals),r=rsd(vals),ci=ci95(vals);
+      const lo=m!=null&&ci!=null?m-ci:null, hi=m!=null&&ci!=null?m+ci:null;
+      html+=`<td class="stat">${fmt(m)}</td><td class="stat">${fmt(s)}</td><td class="stat">${fmt(r)}</td>
+             <td class="stat">${fmt(ci)}</td><td class="stat-grn">${fmt(lo)}</td><td class="stat-grn">${fmt(hi)}</td>`;
+    }
+    html+=`<td style="background:#E2EFDA;color:#1A5C38;font-size:11px">${p.spec||'—'}</td></tr>`;
+  });
+  html+=`</tbody></table></div></div></div>`;
+  cont.innerHTML = html;
+}
+
+function updateRefChar(paramId, idx, val) {
+  if(!ST.refChar[paramId]) ST.refChar[paramId] = Array(N_MEAS).fill('');
+  ST.refChar[paramId][idx] = val;
+  // Update stats live
+  const allVals = ST.refChar[paramId];
+  autoSave();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REF DISSOLUTION
+// ═══════════════════════════════════════════════════════════════════════════
+function renderRefDiss() {
+  PHS.forEach(ph => {
+    const panel = document.getElementById(`ref-diss-${ph}`);
+    if(panel._built) { refreshDissStats('ref',ph); return; }
+    buildDissPanel(panel,'ref',ph,N_TABLETS_REF);
+    panel._built = true;
+  });
+}
+
+function buildDissPanel(panel, who, ph, nTablets) {
+  if(!ST.refDiss[ph]) ST.refDiss[ph] = {};
+  let html = `<div class="card" style="margin-top:12px">
+    <div class="card-header blue">${who==='ref'?'Referans Ürün':'Test Ürünü'} — Dissolüsyon ${PH_LABELS[ph]}</div>
+    <div class="card-body">
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;margin-bottom:12px">
+      <div class="form-group"><label>Çözünme Koşulları</label>
+        <input id="${who}-${ph}-cond" value="${PH_CONDITIONS[ph]}" oninput="autoSave()"></div>
+      <div class="form-group"><label>Limit</label>
+        <input id="${who}-${ph}-limit" placeholder="örn: NLT 85% — 15. dak" oninput="autoSave()"></div>
+    </div>
+    <div class="tbl-wrap"><table>
+    <thead><tr><th class="dark">Zaman (dak)</th><th class="dark">Spec</th>`;
+  for(let i=1;i<=nTablets;i++) html+=`<th>${i}. Tab.</th>`;
+  html+=`<th class="green">ORT%</th><th class="green">SD</th><th class="green">RSD%</th><th class="green">G.A.%95</th><th class="green">ALT</th><th class="green">ÜST</th></tr></thead><tbody>`;
+
+  TP.forEach(tp => {
+    const vals = (ST.refDiss[ph][tp] || Array(nTablets).fill(''));
+    html+=`<tr id="${who}-${ph}-row-${tp}">
+      <td class="label-td" style="width:80px">${tp}</td>
+      <td><input type="text" value="" id="${who}-${ph}-spec-${tp}" placeholder="NLT…"
+        style="width:80px" oninput="autoSave()"></td>`;
+    for(let i=0;i<nTablets;i++) {
+      html+=`<td><input type="number" step="0.1" value="${vals[i]||''}"
+        oninput="updateDiss('${who}','${ph}','${tp}',${i},this.value,${nTablets})"
+        style="width:60px"></td>`;
+    }
+    const m=mean(vals),s=std(vals),r=rsd(vals),ci=ci95(vals);
+    const lo=m!=null&&ci!=null?m-ci:null, hi=m!=null&&ci!=null?m+ci:null;
+    html+=`<td class="stat" id="${who}-${ph}-avg-${tp}">${fmt(m)}</td>
+           <td class="stat" id="${who}-${ph}-sd-${tp}">${fmt(s)}</td>
+           <td class="stat" id="${who}-${ph}-rsd-${tp}">${fmt(r)}</td>
+           <td class="stat" id="${who}-${ph}-ci-${tp}">${fmt(ci)}</td>
+           <td class="stat-grn" id="${who}-${ph}-lo-${tp}">${fmt(lo)}</td>
+           <td class="stat-grn" id="${who}-${ph}-hi-${tp}">${fmt(hi)}</td></tr>`;
+  });
+  html+=`</tbody></table></div>`;
+
+  // Chart
+  html+=`<div style="margin-top:16px"><div class="chart-wrap"><canvas id="${who}-${ph}-chart"></canvas></div></div>`;
+  html+=`</div></div>`;
+  panel.innerHTML = html;
+
+  // Draw chart after DOM is ready
+  setTimeout(() => drawDissChart(who, ph, nTablets), 50);
+}
+
+function updateDiss(who, ph, tp, idx, val, nTablets) {
+  const store = who==='ref' ? ST.refDiss : ST.testDiss;
+  if(!store[ph]) store[ph]={};
+  if(!store[ph][tp]) store[ph][tp]=Array(nTablets).fill('');
+  store[ph][tp][idx]=val;
+  refreshDissStats(who, ph);
+  autoSave();
+}
+
+function refreshDissStats(who, ph) {
+  const store = who==='ref' ? ST.refDiss : ST.testDiss;
+  if(!store||!store[ph]) return;
+  TP.forEach(tp => {
+    const vals = store[ph][tp]||[];
+    const m=mean(vals),s=std(vals),r=rsd(vals),ci=ci95(vals);
+    const lo=m!=null&&ci!=null?m-ci:null,hi=m!=null&&ci!=null?m+ci:null;
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=fmt(v)};
+    set(`${who}-${ph}-avg-${tp}`,m); set(`${who}-${ph}-sd-${tp}`,s);
+    set(`${who}-${ph}-rsd-${tp}`,r); set(`${who}-${ph}-ci-${tp}`,ci);
+    set(`${who}-${ph}-lo-${tp}`,lo); set(`${who}-${ph}-hi-${tp}`,hi);
+  });
+  drawDissChart(who, ph, who==='ref'?N_TABLETS_REF:12);
+}
+
+const chartInstances = {};
+function drawDissChart(who, ph, nTablets) {
+  const canvasId = `${who}-${ph}-chart`;
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const store = who==='ref' ? ST.refDiss : ST.testDiss;
+  const data = TP.map(tp => {
+    const vals = store?.[ph]?.[tp]||[];
+    return mean(vals);
+  });
+  const lo = TP.map(tp => {
+    const vals = store?.[ph]?.[tp]||[];
+    const m=mean(vals),ci=ci95(vals);
+    return m!=null&&ci!=null?m-ci:null;
+  });
+  const hi = TP.map(tp => {
+    const vals = store?.[ph]?.[tp]||[];
+    const m=mean(vals),ci=ci95(vals);
+    return m!=null&&ci!=null?m+ci:null;
+  });
+
+  if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
+  chartInstances[canvasId] = new Chart(canvas, {
+    type:'line',
+    data:{
+      labels: TP,
+      datasets:[
+        {label:'Ortalama (%)',data,borderColor:'#2E75B6',backgroundColor:'rgba(46,117,182,.1)',
+         pointRadius:5,pointBackgroundColor:'#2E75B6',fill:true,tension:.3},
+        {label:'Alt Güven Sınırı',data:lo,borderColor:'#90CAF9',borderDash:[4,4],
+         pointRadius:0,fill:false,tension:.3},
+        {label:'Üst Güven Sınırı',data:hi,borderColor:'#90CAF9',borderDash:[4,4],
+         pointRadius:0,fill:'-1',backgroundColor:'rgba(144,202,249,.15)',tension:.3},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},
+        title:{display:true,text:`Dissolüsyon Profili — ${PH_LABELS[ph]} (Ortalama ± %95 GA)`,
+          font:{size:12,weight:'bold'}}},
+      scales:{
+        x:{title:{display:true,text:'Zaman (dak)'}},
+        y:{min:0,max:115,title:{display:true,text:'Çözünen (%)'},
+           ticks:{stepSize:20}}
+      }
+    }
+  });
+}
+
+function switchDissTab(who, ph, el) {
+  document.querySelectorAll(`#page-ref-diss .ph-tab`).forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll(`#page-ref-diss .diss-panel`).forEach(p=>p.style.display='none');
+  document.getElementById(`ref-diss-${ph}`).style.display='block';
+  renderRefDiss();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DEV PHYSICAL
+// ═══════════════════════════════════════════════════════════════════════════
+function renderDevPhys() {
+  const cont = document.getElementById('dev-phys-content');
+  const activeBatches = BATCH_IDS.filter(b => ST.devPhys[b] && Object.keys(ST.devPhys[b]).length>0);
+  document.getElementById('dev-phys-badge').textContent = activeBatches.length + ' batch';
+
+  let html = `<div class="btn-row">
+    <span style="font-size:12px;color:var(--gray-dark);align-self:center">Görüntülenecek batch'ler:</span>`;
+  BATCH_IDS.forEach(b => {
+    const active = activeBatches.includes(b);
+    html+=`<button class="btn btn-sm ${active?'btn-success':'btn-ghost'}" onclick="toggleBatch('${b}')">${b}</button>`;
+  });
+  html+=`</div>`;
+
+  BATCH_IDS.forEach(b => {
+    const show = !!(ST.devPhys[b] && Object.keys(ST.devPhys[b]).length>0);
+    html+=`<div class="card" id="phys-card-${b}" style="display:${show?'block':'none'}">
+      <div class="card-header green" style="display:flex;justify-content:space-between">
+        <span>${b} — Fiziksel Analiz</span>
+        <span style="font-size:11px;font-weight:400">Görünüm:
+          <input id="phys-${b}-appearance" value="${ST.devPhys?.[b]?.appearance||''}"
+            oninput="updateDevPhysAppearance('${b}',this.value)"
+            style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);
+            border-radius:4px;padding:2px 6px;color:#fff;font-size:11px;width:200px">
+        </span>
+      </div>
+      <div class="card-body"><div class="tbl-wrap"><table>
+        <thead><tr><th class="dark" style="text-align:left">#</th>`;
+    DEV_PHYS_PARAMS.forEach(p => html+=`<th>${p.label}</th>`);
+    html+=`</tr></thead><tbody>`;
+    for(let i=0;i<N_MEAS;i++) {
+      html+=`<tr><td class="label-td">${i+1}</td>`;
+      DEV_PHYS_PARAMS.forEach(p => {
+        const val = ST.devPhys?.[b]?.[p.id]?.[i]||'';
+        html+=`<td><input type="number" step="0.01" value="${val}"
+          oninput="updateDevPhys('${b}','${p.id}',${i},this.value)"
+          style="width:75px"></td>`;
+      });
+      html+=`</tr>`;
+    }
+    // Stats
+    const STAT_LABELS=['ORT','MIN','MAX','RSD%','SD'];
+    const STAT_BG=['stat','stat-grn','stat-grn','stat-yel','stat-yel'];
+    STAT_LABELS.forEach((lbl,si)=>{
+      html+=`<tr><td class="label-td">${lbl}</td>`;
+      DEV_PHYS_PARAMS.forEach(p=>{
+        const vals=ST.devPhys?.[b]?.[p.id]||[];
+        let v;
+        if(lbl==='ORT') v=mean(vals);
+        else if(lbl==='MIN') v=nums(vals).length?Math.min(...nums(vals)):null;
+        else if(lbl==='MAX') v=nums(vals).length?Math.max(...nums(vals)):null;
+        else if(lbl==='RSD%') v=rsd(vals);
+        else v=std(vals);
+        html+=`<td class="${STAT_BG[si]}">${fmt(v)}</td>`;
+      });
+      html+=`</tr>`;
+    });
+    html+=`</tbody></table></div></div></div>`;
+  });
+  cont.innerHTML = html;
+}
+
+function toggleBatch(b) {
+  if(!ST.devPhys[b]) {
+    ST.devPhys[b]={};
+    DEV_PHYS_PARAMS.forEach(p => { ST.devPhys[b][p.id]=Array(N_MEAS).fill(''); });
+  }
+  const card = document.getElementById(`phys-card-${b}`);
+  if(card) card.style.display = card.style.display==='none' ? 'block' : 'none';
+  renderDevPhys();
+}
+
+function updateDevPhys(b,paramId,idx,val) {
+  if(!ST.devPhys[b]) ST.devPhys[b]={};
+  if(!ST.devPhys[b][paramId]) ST.devPhys[b][paramId]=Array(N_MEAS).fill('');
+  ST.devPhys[b][paramId][idx]=val;
+  autoSave();
+}
+function updateDevPhysAppearance(b,val) {
+  if(!ST.devPhys[b]) ST.devPhys[b]={};
+  ST.devPhys[b].appearance=val; autoSave();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DEV CHEMICAL
+// ═══════════════════════════════════════════════════════════════════════════
+function renderDevChem() {
+  const cont = document.getElementById('dev-chem-content');
+  const params = DEV_CHEM_PARAMS.filter(p=>!p.sec);
+
+  let html=`<div class="card"><div class="card-header green">Geliştirme — Kimyasal / Analitik Analizler</div><div class="card-body"><div class="tbl-wrap"><table>
+    <thead><tr><th class="dark" style="text-align:left;width:160px">Parametre</th><th class="dark">Birim</th><th class="dark">Spec</th>`;
+  BATCH_IDS.forEach(b=>html+=`<th>${b}</th>`);
+  html+=`<th class="green">ORT</th><th class="green">RSD%</th></tr></thead><tbody>`;
+
+  let currentSec='';
+  DEV_CHEM_PARAMS.forEach(p=>{
+    if(p.sec){
+      html+=`<tr class="section-row"><td colspan="${5+BATCH_IDS.length}">${p.sec}</td></tr>`;
+      return;
+    }
+    html+=`<tr><td class="label-td">${p.label}</td>
+      <td style="background:#F8FAFF;color:#64748B;font-size:11px">${p.unit}</td>
+      <td style="background:var(--light-grn);color:var(--dark-grn);font-size:11px">${p.spec||'—'}</td>`;
+    const batchVals=[];
+    BATCH_IDS.forEach(b=>{
+      const val=ST.devChem?.[b]?.[p.id]||'';
+      batchVals.push(val);
+      html+=`<td><input type="number" step="0.01" value="${val}"
+        oninput="updateDevChem('${b}','${p.id}',this.value)"
+        style="width:75px"></td>`;
+    });
+    const m=mean(batchVals),r=rsd(batchVals);
+    html+=`<td class="stat">${fmt(m)}</td><td class="stat">${fmt(r)}</td></tr>`;
+  });
+  html+=`</tbody></table></div></div></div>`;
+  cont.innerHTML=html;
+  document.getElementById('dev-chem-badge').textContent = BATCH_IDS.length+' batch';
+}
+
+function updateDevChem(b,paramId,val) {
+  if(!ST.devChem[b]) ST.devChem[b]={};
+  ST.devChem[b][paramId]=val; autoSave();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FORMULATION / BİRİM FORMÜL
+// ═══════════════════════════════════════════════════════════════════════════
+function renderFormula() {
+  const excips = ST.formula.excipients;
+  const tw = ST.formula.tabletWeight || 600;
+  const bs = ST.formula.batchSize || 5000;
+
+  let html=`
+  <div class="card">
+    <div class="card-header yellow">Formülasyon Parametreleri</div>
+    <div class="card-body">
+      <div class="form-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="form-group input-highlight">
+          <label>Hedef Tablet Ağırlığı (mg)</label>
+          <input type="number" id="fw-tw" value="${tw}" oninput="updateFormulaParam('tabletWeight',this.value)">
+        </div>
+        <div class="form-group input-highlight">
+          <label>Batch Boyutu (tablet)</label>
+          <input type="number" id="fw-bs" value="${bs}" oninput="updateFormulaParam('batchSize',this.value)">
+        </div>
+        <div class="form-group">
+          <label>Batch Ağırlığı (kg) — Oto.</label>
+          <input readonly value="${(tw*bs/1000000).toFixed(3)} kg" id="fw-bkg">
+        </div>
+        <div class="form-group">
+          <label>Birim</label>
+          <select id="fw-unit" onchange="autoSave()">
+            <option>% w/w</option><option>mg/tablet</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header yellow" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Birim Formül — ${BATCH_IDS.length} Deneme</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff"
+          onclick="addExcipient()">+ Hammadde Ekle</button>
+        <button class="btn btn-sm" style="background:rgba(220,38,38,.7);color:#fff"
+          onclick="clearExcipients()">🗑️ Listeyi Temizle</button>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff"
+          onclick="exportFormula()">📋 Kopyala</button>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0"><div class="tbl-wrap"><table>
+      <thead>
+        <tr>
+          <th class="dark" style="text-align:left;width:200px">Hammadde</th>
+          <th class="dark">Fonksiyon</th>
+          <th class="dark">Grade/Kaynak</th>`;
+  BATCH_IDS.forEach(b=>html+=`<th style="background:var(--mid-blue)">${b}<br><span style="font-size:9px;opacity:.8">%&nbsp;&nbsp;&nbsp;mg</span></th>`);
+  html+=`<th class="dark">Sil</th></tr></thead><tbody>`;
+
+  excips.forEach((ex,ei)=>{
+    const rowBg = ex.isApi ? 'background:var(--yellow)' : '';
+    html+=`<tr>
+      <td class="label-td" style="${rowBg}">
+        <input value="${ex.name}" oninput="updateExcip(${ei},'name',this.value)"
+          style="width:170px;font-weight:${ex.isApi?700:400}"></td>
+      <td>
+        <input value="${ex.func||''}" oninput="updateExcip(${ei},'func',this.value)"
+          style="width:120px;font-style:italic;color:#64748B"></td>
+      <td style="background:var(--yellow)">
+        <input value="${ex.grade||''}" oninput="updateExcip(${ei},'grade',this.value)"
+          style="width:130px;background:transparent"></td>`;
+    BATCH_IDS.forEach(b=>{
+      const pct = ST.formula.values?.[ei]?.[b]||'';
+      const mg = pct ? (parseFloat(pct)*tw/100).toFixed(1) : '';
+      html+=`<td style="padding:3px">
+        <div style="display:flex;gap:2px;align-items:center">
+          <input type="number" step="0.01" value="${pct}" placeholder="%"
+            oninput="updateFormulaVal(${ei},'${b}',this.value)"
+            style="width:48px;background:${ex.isApi?'#FEFCE8':'#F0F7FF'}">
+          <span style="font-size:10px;color:#2E75B6;min-width:38px;text-align:right" id="mg-${ei}-${b}">${mg?mg+' mg':''}</span>
+        </div></td>`;
+    });
+    html+=`<td><button class="btn btn-sm btn-danger" onclick="deleteExcip(${ei})">✕</button></td></tr>`;
+  });
+
+  // TOTAL row
+  html+=`<tr style="background:var(--dark-blue)">
+    <td colspan="3" style="text-align:center;font-weight:700;color:#fff;padding:8px">TOPLAM</td>`;
+  BATCH_IDS.forEach(b=>{
+    let total=0,totalMg=0;
+    excips.forEach((ex,ei)=>{
+      const pct=parseFloat(ST.formula.values?.[ei]?.[b]||0)||0;
+      total+=pct; totalMg+=pct*tw/100;
+    });
+    const ok = total>0 && Math.abs(total-100)<0.5;
+    html+=`<td style="background:${ok?'var(--dark-grn)':'#7B1515'};color:#fff;font-weight:700;text-align:center">
+      ${total>0?total.toFixed(2)+'%':'—'}<br><span style="font-size:10px;opacity:.8">${total>0?totalMg.toFixed(0)+' mg':''}</span>
+    </td>`;
+  });
+  html+=`<td style="background:var(--dark-blue)"></td></tr>`;
+  html+=`</tbody></table></div></div></div>`;
+
+  document.getElementById('formula-content').innerHTML=html;
+}
+
+function updateFormulaParam(key, val) {
+  ST.formula[key] = parseFloat(val)||0;
+  if(key==='tabletWeight'||key==='batchSize') {
+    const tw=ST.formula.tabletWeight||600, bs=ST.formula.batchSize||5000;
+    const el=document.getElementById('fw-bkg');
+    if(el) el.value=(tw*bs/1000000).toFixed(3)+' kg';
+    // Refresh mg values
+    ST.formula.excipients.forEach((_,ei)=>{
+      BATCH_IDS.forEach(b=>{
+        const pct=parseFloat(ST.formula.values?.[ei]?.[b]||0)||0;
+        const el=document.getElementById(`mg-${ei}-${b}`);
+        if(el) el.textContent=pct?((pct*tw/100).toFixed(1)+' mg'):'';
+      });
+    });
+  }
+  autoSave();
+}
+
+function updateExcip(idx,key,val) {
+  ST.formula.excipients[idx][key]=val; autoSave();
+}
+
+function updateFormulaVal(ei, b, val) {
+  if(!ST.formula.values[ei]) ST.formula.values[ei]={};
+  ST.formula.values[ei][b]=val;
+  const tw=ST.formula.tabletWeight||600;
+  const pct=parseFloat(val)||0;
+  const el=document.getElementById(`mg-${ei}-${b}`);
+  if(el) el.textContent=pct?((pct*tw/100).toFixed(1)+' mg'):'';
+  autoSave();
+}
+
+function addExcipient() {
+  ST.formula.excipients.push({name:'[Yeni Hammadde]',func:'',grade:''});
+  renderFormula(); autoSave();
+}
+
+function deleteExcip(idx) {
+  ST.formula.excipients.splice(idx,1);
+  // Remove from values
+  const newVals={};
+  Object.keys(ST.formula.values).forEach(k=>{
+    const ki=parseInt(k);
+    if(ki<idx) newVals[ki]=ST.formula.values[k];
+    else if(ki>idx) newVals[ki-1]=ST.formula.values[k];
+  });
+  ST.formula.values=newVals;
+  renderFormula(); autoSave();
+}
+
+function clearExcipients() {
+  if(!confirm('Tüm hammadde listesi ve formülasyon değerleri silinecek. Emin misiniz?')) return;
+  ST.formula.excipients = [];
+  ST.formula.values = {};
+  renderFormula();
+  autoSave();
+  toast('Hammadde listesi temizlendi');
+}
+
+function exportFormula() {
+  let text='FORMÜLASYON BİRİM FORMÜL\n';
+  text+=ST.formula.excipients.map((ex,ei)=>{
+    const vals=BATCH_IDS.map(b=>(ST.formula.values?.[ei]?.[b]||'')).join('\t');
+    return `${ex.name}\t${ex.func}\t${ex.grade}\t${vals}`;
+  }).join('\n');
+  navigator.clipboard.writeText(text).then(()=>toast('Panoya kopyalandı'));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// f1/f2
+// ═══════════════════════════════════════════════════════════════════════════
+function renderF2() {
+  PHS.forEach(ph => {
+    const panel = document.getElementById(`f2-${ph}`);
+    if(!panel._built) { buildF2Panel(panel, ph); panel._built=true; }
+  });
+}
+
+function buildF2Panel(panel, ph) {
+  if(!ST.f2[ph]) ST.f2[ph]={ref:{},test:{}};
+  const usableTP = TP.filter(t=>t>0);
+
+  let html=`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+    <div class="card">
+      <div class="card-header blue">Referans — Ortalama Değerler (${PH_LABELS[ph]})</div>
+      <div class="card-body">
+        <p style="font-size:11px;color:var(--gray-dark);margin-bottom:8px">
+          Referans sayfasından manuel olarak girin veya formülle bağlayın.</p>
+        <table><thead><tr><th class="dark">Zaman</th><th class="dark">Ref Ort (%)</th></tr></thead><tbody>`;
+  usableTP.forEach(tp=>{
+    const v=ST.f2[ph]?.ref?.[tp]||'';
+    html+=`<tr><td class="label-td">${tp} dak</td>
+      <td><input type="number" step="0.01" value="${v}"
+        oninput="updateF2('${ph}','ref','${tp}',this.value)"
+        style="width:90px;background:var(--light-blue)"></td></tr>`;
+  });
+  html+=`</tbody></table></div></div>
+
+    <div class="card">
+      <div class="card-header green">Test Ürünü — Ortalama Değerler (${PH_LABELS[ph]})</div>
+      <div class="card-body">
+        <p style="font-size:11px;color:var(--gray-dark);margin-bottom:8px">
+          Geliştirme dissolüsyon verilerinizi girin.</p>
+        <table><thead><tr><th class="dark">Zaman</th><th class="green">Test Ort (%)</th></tr></thead><tbody>`;
+  usableTP.forEach(tp=>{
+    const v=ST.f2[ph]?.test?.[tp]||'';
+    html+=`<tr><td class="label-td">${tp} dak</td>
+      <td><input type="number" step="0.01" value="${v}"
+        oninput="updateF2('${ph}','test','${tp}',this.value)"
+        style="width:90px;background:var(--light-grn)"></td></tr>`;
+  });
+  html+=`</tbody></table></div></div></div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="card-header red">f1 / f2 Hesabı — ${PH_LABELS[ph]}</div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+        <div class="kpi" id="f2-${ph}-f1box"><div class="num" id="f2-${ph}-f1">—</div><div class="lbl">f1 (Farklılık Faktörü)</div></div>
+        <div class="kpi" id="f2-${ph}-f2box"><div class="num" id="f2-${ph}-f2">—</div><div class="lbl">f2 (Benzerlik Faktörü)</div></div>
+        <div class="kpi" id="f2-${ph}-resultbox"><div class="num" style="font-size:18px" id="f2-${ph}-result">—</div><div class="lbl">Sonuç</div></div>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th class="dark">Zaman (dak)</th><th class="blue">Ref Ort (%)</th><th class="green">Test Ort (%)</th>
+          <th style="background:var(--purple);color:#fff">R–T</th>
+          <th style="background:var(--purple);color:#fff">(R–T)²</th>
+          <th style="background:var(--purple);color:#fff">|R–T|</th></tr></thead><tbody id="f2-${ph}-tbody">
+        </tbody></table></div>
+      <p style="margin-top:10px;font-size:11px;color:var(--gray-dark)">
+        * f2 ≥ 50 → Benzerlik vardır (EMA kılavuzu).
+        Her iki profilde herhangi bir zaman noktasında Ref > 85% ise f2 hesaplanmaz (85% kuralı).</p>
+    </div></div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="card-header" style="background:var(--purple)">Dissolüsyon Karşılaştırma Grafiği — ${PH_LABELS[ph]}</div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="f2-${ph}-chart"></canvas></div></div>
+  </div>`;
+
+  panel.innerHTML=html;
+  calcF2(ph);
+}
+
+function updateF2(ph, who, tp, val) {
+  if(!ST.f2[ph]) ST.f2[ph]={ref:{},test:{}};
+  ST.f2[ph][who][tp]=val;
+  calcF2(ph);
+  autoSave();
+}
+
+function calcF2(ph) {
+  if(!ST.f2[ph]) return;
+  const usableTP=TP.filter(t=>t>0);
+  const ref=usableTP.map(t=>parseFloat(ST.f2[ph]?.ref?.[t])||0);
+  const test=usableTP.map(t=>parseFloat(ST.f2[ph]?.test?.[t])||0);
+  const hasData = ref.some(v=>v>0) && test.some(v=>v>0);
+
+  // EMA: if any Ref>85%, f2 not calculated
+  const refAbove85 = ref.some(v=>v>=85);
+
+  // Table
+  const tbody=document.getElementById(`f2-${ph}-tbody`);
+  if(!tbody) return;
+  let bodyHtml='';
+  usableTP.forEach((tp,i)=>{
+    const r=ref[i]||0, t=test[i]||0;
+    const diff=r-t, sq=diff*diff, abs=Math.abs(diff);
+    bodyHtml+=`<tr>
+      <td class="label-td">${tp} dak</td>
+      <td class="stat">${r||'—'}</td>
+      <td class="stat-grn">${t||'—'}</td>
+      <td style="background:var(--light-pur);color:var(--purple);font-weight:600">${r&&t?diff.toFixed(2):'—'}</td>
+      <td style="background:var(--light-pur);color:var(--purple);font-weight:600">${r&&t?sq.toFixed(2):'—'}</td>
+      <td style="background:var(--light-pur);color:var(--purple);font-weight:600">${r&&t?abs.toFixed(2):'—'}</td>
+    </tr>`;
+  });
+  tbody.innerHTML=bodyHtml;
+
+  let f1val=null,f2val=null;
+  if(hasData) {
+    const sumR=ref.reduce((s,v)=>s+v,0);
+    const sumAbsDiff=usableTP.map((_,i)=>Math.abs(ref[i]-test[i])).reduce((s,v)=>s+v,0);
+    const sumSqDiff=usableTP.map((_,i)=>(ref[i]-test[i])**2).reduce((s,v)=>s+v,0);
+    const n=usableTP.length;
+    if(sumR>0) f1val=sumAbsDiff/sumR*100;
+    if(!refAbove85) f2val=50*Math.log10(100/Math.sqrt(1+sumSqDiff/n));
+  }
+
+  // Display
+  const f1el=document.getElementById(`f2-${ph}-f1`);
+  const f2el=document.getElementById(`f2-${ph}-f2`);
+  const rel=document.getElementById(`f2-${ph}-result`);
+  const rbox=document.getElementById(`f2-${ph}-resultbox`);
+  if(f1el) f1el.textContent=f1val!=null?f1val.toFixed(1):'—';
+  if(f2el) {
+    if(refAbove85) { f2el.textContent='N/A'; if(rel) rel.textContent='85% Kuralı'; }
+    else { f2el.textContent=f2val!=null?f2val.toFixed(1):'—'; }
+  }
+  if(rel&&!refAbove85) {
+    if(f2val!=null) {
+      const pass=f2val>=50;
+      rel.textContent=pass?'✅ Benzer':'⚠️ Benzer Değil';
+      if(rbox) rbox.style.background=pass?'var(--light-grn)':'var(--light-red)';
+    }
+  }
+
+  // Chart
+  const canvas=document.getElementById(`f2-${ph}-chart`);
+  if(canvas) {
+    const id=`f2-${ph}-chart`;
+    if(chartInstances[id]) chartInstances[id].destroy();
+    chartInstances[id]=new Chart(canvas,{
+      type:'line',
+      data:{
+        labels:usableTP,
+        datasets:[
+          {label:'Referans',data:ref.map(v=>v||null),borderColor:'#2E75B6',backgroundColor:'rgba(46,117,182,.1)',
+           pointRadius:5,fill:true,tension:.3},
+          {label:'Test Ürünü',data:test.map(v=>v||null),borderColor:'#1A5C38',backgroundColor:'rgba(26,92,56,.1)',
+           pointRadius:5,fill:true,tension:.3},
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom'},
+          title:{display:true,text:`Karşılaştırmalı Dissolüsyon — ${PH_LABELS[ph]}`,font:{size:12,weight:'bold'}}},
+        scales:{x:{title:{display:true,text:'Zaman (dak)'}},
+          y:{min:0,max:115,title:{display:true,text:'Çözünen (%)'},ticks:{stepSize:20}}}}
+    });
+  }
+}
+
+function switchF2Tab(ph, el) {
+  document.querySelectorAll('#page-f2 .ph-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#page-f2 .f2-panel').forEach(p=>p.style.display='none');
+  document.getElementById(`f2-${ph}`).style.display='block';
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EXEC SUMMARY
+// ═══════════════════════════════════════════════════════════════════════════
+const EXEC_FIELDS = {
+  mol:['name','chem','formula','mw','bcs','pka','logp','mp','sol12','sol45','sol68','poly','hygro','d50','d90','bulkdens','tapdens','photo','thermal','incompat','moa','indication'],
+  ref:['brand','mah','form','strength','date','status','country','atc','appNo','route','pk'],
+  reg:['path','be','patent','patexp','excl','exclexp','competition'],
+  dev:['form','strength','method','market','timeline','target','rationale'],
+  risk:['form','form_note','anal','anal_note','reg','reg_note','ip','ip_note','mkt','mkt_note']
+};
+
+function renderExec() {
+  // Restore all inputs
+  Object.entries(EXEC_FIELDS).forEach(([sec, fields]) => {
+    fields.forEach(f => {
+      const el = document.getElementById(`ex-${sec}-${f}`);
+      if(el && ST.exec[sec]?.[f]) el.value = ST.exec[sec][f];
+    });
+  });
+  scheduleExecPreview();
+}
+
+function updateExec(sec, field, val) {
+  if(!ST.exec[sec]) ST.exec[sec] = {};
+  ST.exec[sec][field] = val;
+  autoSave();
+  scheduleExecPreview();
+}
+
+let _execTimer;
+function scheduleExecPreview() {
+  clearTimeout(_execTimer);
+  _execTimer = setTimeout(renderExecPreview, 300);
+}
+
+function renderExecPreview() {
+  const wrap = document.getElementById('exec-preview');
+  if(!wrap) return;
+  const mol  = ST.exec.mol  || {};
+  const ref  = ST.exec.ref  || {};
+  const reg  = ST.exec.reg  || {};
+  const dev  = ST.exec.dev  || {};
+  const risk = ST.exec.risk || {};
+  const lit  = ST.exec.lit  || {};
+  const proj = ST.project   || {};
+  const today = new Date().toLocaleDateString('tr-TR');
+
+  const apiName   = mol.name    || proj.p_api    || '[API Adı]';
+  const brandName = ref.brand   || proj.r_name   || '[Referans Ürün]';
+  const strength  = dev.strength|| ref.strength  || proj.p_strength || '';
+  const dosageForm= dev.form    || ref.form      || proj.p_dosage   || 'Film Kaplı Tablet';
+
+  const empty   = v => !v || String(v).trim() === '';
+  const val     = (v, fb='—') => empty(v) ? fb : v;
+  const riskBadge = r => {
+    if(!r) return '<span style="color:#aaa">—</span>';
+    const cls = {H:'risk-H',M:'risk-M',L:'risk-L'};
+    const lbl = {H:'Yüksek',M:'Orta',L:'Düşük'};
+    return `<span class="${cls[r]}">${lbl[r]}</span>`;
+  };
+
+  // ── Kapak ──────────────────────────────────────────────────────────────────
+  let html = `
+  <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #1F3864">
+    <div style="font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:#666;font-family:Arial,sans-serif">Pre-Formülasyon Çalışması — Gizli</div>
+    <h2 style="margin:8px 0 4px">${apiName}${strength?' '+strength:''} ${dosageForm}</h2>
+    <div class="doc-subtitle">
+      Referans: <strong>${brandName}</strong>${ref.mah?' ('+ref.mah+')':''}&nbsp;|&nbsp;${today}
+      ${proj.p_owner?'&nbsp;|&nbsp;Hazırlayan: '+proj.p_owner:''}
+    </div>
+    <p style="font-size:11px;color:#888;margin:0;font-family:Arial,sans-serif">
+      ICH Q8(R2) / Q11 kılavuzları doğrultusunda hazırlanmıştır. Bu doküman FormDev sistemi tarafından otomatik üretilmiştir.
+    </p>
+  </div>`;
+
+  // ── 1. Pre-Formülasyon Özeti ────────────────────────────────────────────────
+  html += `<h3>1. Ön Değerlendirme & Geliştirme Gerekçesi</h3>`;
+  const hasMol = !empty(mol.name) || !empty(mol.indication);
+  if(hasMol) {
+    html += `<p><strong>${apiName}</strong>`;
+    if(mol.bcs) html += `, BCS ${mol.bcs.split('—')[0].trim()} sınıfı,`;
+    if(mol.moa) html += ` ${mol.moa.substring(0,100)}${mol.moa.length>100?'…':''} etki mekanizmasına sahip`;
+    if(mol.indication) html += ` bir farmakolojik ajandır. Endikasyon: <em>${mol.indication.substring(0,200)}</em>.`;
+    html += `</p>`;
+    if(!empty(dev.rationale)) html += `<p>${dev.rationale}</p>`;
+    if(!empty(dev.market)||!empty(dev.timeline)) {
+      html += `<p>Hedef pazar: <strong>${val(dev.market)}</strong>. Geliştirme süresi: <strong>${val(dev.timeline)}</strong>. Planlanan başvuru: <strong>${val(dev.target)}</strong>.</p>`;
+    }
+  } else {
+    html += `<p class="exec-empty">Molekül ve geliştirme gerekçesi girilince bu bölüm oluşur.</p>`;
+  }
+
+  // ── 2. API Fizikokimyasal Karakterizasyon ───────────────────────────────────
+  html += `<h3>2. API Fizikokimyasal Karakterizasyon</h3>`;
+  const hasMolData = ['mw','bcs','pka','logp','formula','mp'].some(k => !empty(mol[k]));
+  if(hasMolData) {
+    html += `<table><thead><tr><th>Özellik</th><th>Değer</th><th>Yorumlama</th></tr></thead><tbody>`;
+    if(!empty(mol.formula)) html+=`<tr><td>Molekül Formülü</td><td><strong>${mol.formula}</strong></td><td>—</td></tr>`;
+    if(!empty(mol.mw)) {
+      const mwV = parseFloat(mol.mw);
+      html+=`<tr><td>Molekül Ağırlığı</td><td>${mol.mw} g/mol</td><td>${mwV<500?'✅ Lipinski uyumlu (MW&lt;500)':mwV<800?'⚠️ Büyük molekül — absorpsiyon takibi':' ❌ MW&gt;800 — oral BAY riski'}</td></tr>`;
+    }
+    if(!empty(mol.pka)) html+=`<tr><td>pKa</td><td>${mol.pka}</td><td>pH-bağımlı iyonizasyon — çözünürlük ve membran geçirgenliği için kritik</td></tr>`;
+    if(!empty(mol.logp)) {
+      const lp = parseFloat(mol.logp);
+      html+=`<tr><td>logP / lipofilite</td><td>${mol.logp}</td><td>${lp>5?'❌ Yüksek lipofilite — çözünürlük sorunu':lp<0?'⚠️ Yüksek hidrofilite — geçirgenlik düşük olabilir':'✅ Lipinski uyumlu (0–5)'}</td></tr>`;
+    }
+    if(!empty(mol.mp)) html+=`<tr><td>Erime Noktası</td><td>${mol.mp} °C</td><td>${parseFloat(mol.mp)>200?'Yüksek EM — HME süreçleri için zorlu':parseFloat(mol.mp)<50?'Düşük EM — sıcak işlemde dikkat gerekir':'Normal aralık'}</td></tr>`;
+    if(!empty(mol.bcs)) html+=`<tr><td>BCS Sınıfı (tahmin)</td><td><strong>${mol.bcs.split('—')[0].trim()}</strong></td><td>${mol.bcs}</td></tr>`;
+    if(!empty(mol.chem)) html+=`<tr><td>IUPAC Adı</td><td style="font-size:11px">${mol.chem}</td><td>—</td></tr>`;
+    html+=`</tbody></table>`;
+
+    // Çözünürlük tablosu
+    const hasSol = !empty(mol.sol12)||!empty(mol.sol45)||!empty(mol.sol68);
+    if(hasSol) {
+      html+=`<h4>pH-Bağımlı Çözünürlük Profili</h4>
+      <table><thead><tr><th>Ortam</th><th>Çözünürlük (mg/mL)</th><th>Yorum</th></tr></thead><tbody>
+        <tr><td>pH 1.2 (Mide)</td><td>${val(mol.sol12)}</td><td>${mol.sol12?(parseFloat(mol.sol12)>1?'✅ Yeterli':'⚠️ Düşük — çözünürlük artırma gerekebilir'):'—'}</td></tr>
+        <tr><td>pH 4.5 (Duodenum)</td><td>${val(mol.sol45)}</td><td>—</td></tr>
+        <tr><td>pH 6.8 (İnce bağırsak)</td><td>${val(mol.sol68)}</td><td>—</td></tr>
+      </tbody></table>`;
+    }
+  } else {
+    html+=`<p class="exec-empty">Molekül araştırması yapılınca fizikokimyasal profil otomatik dolar.</p>`;
+  }
+
+  // ── 3. Katı Hal & Akış Özellikleri ─────────────────────────────────────────
+  html += `<h3>3. Katı Hal, Partikül & Akış Özellikleri</h3>`;
+  const hasSolid = ['poly','hygro','d50','d90','bulkdens','tapdens','carr','photo','thermal','incompat'].some(k=>!empty(mol[k]));
+  if(hasSolid) {
+    html+=`<table><thead><tr><th>Parametre</th><th>Değer / Durum</th><th>Formülasyon Etkisi</th></tr></thead><tbody>`;
+    if(!empty(mol.poly))     html+=`<tr><td>Polimorfik Form</td><td><strong>${mol.poly}</strong></td><td>Üretim sürecinde form değişimi takip edilmeli</td></tr>`;
+    if(!empty(mol.hygro))    html+=`<tr><td>Higroskopiklik</td><td>${mol.hygro}</td><td>${mol.hygro.includes('Yüksek')||mol.hygro.includes('Deli')?'⚠️ Nem kontrolü kritik — düşük higroskopik dolgu tercihi':'✅ Standart nem koşulları yeterli'}</td></tr>`;
+    if(!empty(mol.d50))      html+=`<tr><td>D50 Parçacık Boyutu</td><td>${mol.d50} µm</td><td>${parseFloat(mol.d50)>100?'Büyük partikül — mikronizasyon değerlendirin':'Standart aralık'}</td></tr>`;
+    if(!empty(mol.d90))      html+=`<tr><td>D90 Parçacık Boyutu</td><td>${mol.d90} µm</td><td>—</td></tr>`;
+    if(!empty(mol.bulkdens)) html+=`<tr><td>Bulk Density</td><td>${mol.bulkdens} g/mL</td><td>—</td></tr>`;
+    if(!empty(mol.tapdens))  html+=`<tr><td>Tapped Density</td><td>${mol.tapdens} g/mL</td><td>—</td></tr>`;
+    if(!empty(mol.carr)) {
+      const c = parseFloat(mol.carr);
+      const flowClass = c<11?'Mükemmel akış':c<16?'İyi':c<21?'Kabul edilebilir':c<26?'Geçirebilir':'Çok kötü — granülasyon gerekli';
+      html+=`<tr><td>Carr İndeksi</td><td>${mol.carr}%</td><td>${c>25?'⚠️':'✅'} ${flowClass}</td></tr>`;
+    }
+    if(!empty(mol.photo))    html+=`<tr><td>Fotostabilite</td><td>${mol.photo}</td><td>${mol.photo.includes('Hassas')||mol.photo.includes('amber')?'⚠️ Işık geçirmez ambalaj gerekli':'✅ Standart ambalaj'}</td></tr>`;
+    if(!empty(mol.thermal))  html+=`<tr><td>Termal Stabilite</td><td>${mol.thermal}</td><td>—</td></tr>`;
+    if(!empty(mol.incompat))  html+=`<tr><td>Uyumsuz Eksipiyanlar</td><td style="color:#B91C1C"><strong>${mol.incompat}</strong></td><td>⚠️ Formülasyonda kaçınılmalı</td></tr>`;
+    html+=`</tbody></table>`;
+  } else {
+    html+=`<p class="exec-empty">Katı hal verisi girilince bu bölüm oluşur. Bulk/tapped density girilirse Carr indeksi otomatik hesaplanır.</p>`;
+  }
+
+  // ── 4. BCS Sınıflandırması & Geçirgenlik Tahmini ───────────────────────────
+  html += `<h3>4. BCS Sınıflandırması & Biyofarm. Değerlendirme</h3>`;
+  if(!empty(mol.bcs)) {
+    const bcsNum = mol.bcs.includes('IV')?4:mol.bcs.includes('III')?3:mol.bcs.includes('II')?2:1;
+    const bcsTable = {
+      1: {sol:'Yüksek (&gt;doz/250mL)', perm:'Yüksek (&gt;90% absorpsiyon)', strategy:'Standart hızlı-çözünen tablet. Biyo-muafiyet uygulanabilir.', be:'BCS I: EMA/FDA biyo-muafiyet kriterleri değerlendirilebilir'},
+      2: {sol:'Düşük', perm:'Yüksek', strategy:'Çözünürlük artırma kritik: surfaktan, amorf form, nano-partikül, HME veya lipid bazlı sistem', be:'In vivo BE çalışması gerekli'},
+      3: {sol:'Yüksek', perm:'Düşük', strategy:'Geçirgenlik artırma veya biyo-muafiyet. İnce bağırsak segmentine hedefleme değerlendirilebilir.', be:'BCS III: Hızlı çözünen formda biyo-muafiyet başvurulabilir'},
+      4: {sol:'Düşük', perm:'Düşük', strategy:'En zorlu sınıf: SMEDDS/lipid bazlı veya nanoformülasyon. Her iki bariyer eş zamanlı aşılmalı.', be:'In vivo BE çalışması zorunlu'},
+    };
+    const b = bcsTable[bcsNum] || bcsTable[1];
+    html+=`<table><thead><tr><th>Parametre</th><th>BCS ${bcsNum} Profili</th></tr></thead><tbody>
+      <tr><td>BCS Sınıfı</td><td><strong>${mol.bcs}</strong></td></tr>
+      <tr><td>Çözünürlük Sınıfı</td><td>${b.sol}</td></tr>
+      <tr><td>Geçirgenlik Sınıfı</td><td>${b.perm}</td></tr>
+      <tr><td>Önerilen Formülasyon Stratejisi</td><td>${b.strategy}</td></tr>
+      <tr><td>Biyoeşdeğerlik / Biyo-muafiyet</td><td>${b.be}</td></tr>
+    </tbody></table>`;
+  } else {
+    html+=`<p class="exec-empty">BCS sınıfı seçilince değerlendirme tablosu oluşur. Molekül araştırması BCS'yi otomatik tahmin eder.</p>`;
+  }
+
+  // ── 5. Referans Ürün Profili ────────────────────────────────────────────────
+  html += `<h3>5. Referans Ürün Profili (Orijinatör)</h3>`;
+  const hasRef = !empty(ref.brand)||!empty(ref.mah);
+  if(hasRef) {
+    html+=`<table><thead><tr><th>Parametre</th><th>Bilgi</th></tr></thead><tbody>
+      <tr><td>Ticari Ad</td><td><strong>${val(ref.brand)}</strong></td></tr>
+      <tr><td>Ruhsat Sahibi / Orijinatör</td><td>${val(ref.mah)}</td></tr>
+      <tr><td>Doz Formu</td><td>${val(ref.form)}</td></tr>
+      <tr><td>Güç (Strength)</td><td>${val(ref.strength)}</td></tr>
+      <tr><td>Uygulama Yolu</td><td>${val(ref.route)}</td></tr>
+      ${ref.appNo?`<tr><td>FDA Başvuru No</td><td>${val(ref.appNo)}</td></tr>`:''}
+      <tr><td>Ruhsat Tarihi</td><td>${val(ref.date)}</td></tr>
+      <tr><td>ATC Kodu</td><td>${val(ref.atc)}</td></tr>
+      <tr><td>Referans Ülke / Prosedür</td><td>${val(ref.country)}</td></tr>
+      <tr><td>Piyasa Durumu</td><td>${val(ref.status)}</td></tr>
+    </tbody></table>`;
+    if(!empty(ref.pk)) html+=`<h4>Farmakokinetik / Klinik Notlar</h4><p style="font-size:12px">${ref.pk.substring(0,600)}${ref.pk.length>600?'…':''}</p>`;
+  } else {
+    html+=`<p class="exec-empty">Referans ürün bilgisi girilince veya "Molekül Araştır" butonuyla otomatik doldurulunca bu bölüm oluşur.</p>`;
+  }
+
+  // ── 6. Eksipiyan Uyumluluk Ön Değerlendirmesi ──────────────────────────────
+  html += `<h3>6. Eksipiyan Uyumluluk Ön Değerlendirmesi</h3>`;
+  const bcsN = !empty(mol.bcs)?(mol.bcs.includes('IV')?4:mol.bcs.includes('III')?3:mol.bcs.includes('II')?2:1):0;
+  const lpV  = parseFloat(mol.logp)||0;
+  const pkaN = parseFloat(mol.pka)||null;
+  const incompatList = (mol.incompat||'').toLowerCase();
+
+  const excipCompatRows = [
+    {name:'MCC (Avicel PH 102)', role:'Dolgu / Bağlayıcı', compat: 'iyi', note:'Çoğu API ile uyumlu. Güçlü baz API ile takip et.'},
+    {name:'Laktoz Monohidrat', role:'Dolgu', compat: (pkaN&&pkaN>8||incompatList.includes('laktoz'))?'dikkat':'iyi', note: (pkaN&&pkaN>8)?'Amin içeren API — Maillard reaksiyonu riski. Mannitol veya MCC tercih et.':'Genel uyumlu.'},
+    {name:'Magnezyum Stearat', role:'Kayganlayıcı', compat: (pkaN&&pkaN<4&&lpV>3)?'dikkat':'iyi', note:(pkaN&&pkaN<4)?'Asidik API ile sabun oluşumu — düşük konsantrasyon ve kısa karıştırma süresi uygula':'Standart. Aşırı kullanımdan kaçın.'},
+    {name:'Croscarmellose Sodium', role:'Dağıltıcı', compat:'iyi', note:'Çoğu API ile uyumlu. Katyonik API dikkat.'},
+    {name:'Povidon K30 (PVP)', role:'Bağlayıcı', compat:'iyi', note:'Geniş uyumluluk. Aldehit içeren yapılar için takip et.'},
+    {name:'Sodyum Lauril Sülfat', role:'Surfaktan', compat: (bcsN===2||bcsN===4)?'önerilir':'iyi', note: (bcsN===2||bcsN===4)?'BCS II/IV: çözünürlük artırımı için önerilir':'Gerekli değilse kaçın — irritasyon potansiyeli.'},
+    {name:'HPMC / Hypromellose', role:'Film kaplama / matris', compat:'iyi', note:'Geniş pH aralığında uyumlu. Gastrorezistan için HPMC-AS seç.'},
+    {name:'Mannitol DC', role:'Dolgu (amin API için)', compat: (pkaN&&pkaN>8)?'önerilir':'iyi', note:(pkaN&&pkaN>8)?'Amin API için laktoz alternatifi — Maillard yok':'Genel uyumlu.'},
+  ];
+
+  html+=`<table><thead><tr><th>Eksipiyan</th><th>Fonksiyon</th><th>Uyumluluk</th><th>Not</th></tr></thead><tbody>`;
+  excipCompatRows.forEach(r=>{
+    const badge = r.compat==='önerilir'
+      ? '<span style="background:#E2EFDA;color:#1A5C38;padding:1px 8px;border-radius:3px;font-size:10px;font-weight:700">ÖNERİLİR</span>'
+      : r.compat==='dikkat'
+        ? '<span style="background:#FFF2CC;color:#7F6000;padding:1px 8px;border-radius:3px;font-size:10px;font-weight:700">DİKKAT</span>'
+        : '<span style="background:#EFF6FF;color:#1D4ED8;padding:1px 8px;border-radius:3px;font-size:10px;font-weight:700">İYİ</span>';
+    html+=`<tr><td><strong>${r.name}</strong></td><td>${r.role}</td><td>${badge}</td><td style="font-size:11px">${r.note}</td></tr>`;
+  });
+  html+=`</tbody></table>`;
+  html+=`<p style="font-size:10.5px;color:#888">Bu tablo fizikokimyasal özelliklere (pKa, logP, BCS) dayalı kural-tabanlı ön değerlendirmedir. DSC / FT-IR uyumluluk çalışmalarıyla doğrulanmalıdır.</p>`;
+
+  // ── 7. Regülatör & IP Durumu ────────────────────────────────────────────────
+  html += `<h3>7. Regülatör & Fikri Mülkiyet Durumu</h3>`;
+  const hasReg = !empty(reg.path)||!empty(reg.patent);
+  if(hasReg) {
+    html+=`<table><thead><tr><th>Konu</th><th>Durum</th></tr></thead><tbody>
+      <tr><td>Başvuru Yolu</td><td>${val(reg.path)}</td></tr>
+      <tr><td>Biyoeşdeğerlik</td><td>${val(reg.be)}</td></tr>
+      <tr><td>Patent Durumu</td><td>${val(reg.patent)}${reg.patexp?' (bitiş: '+reg.patexp+')':''}</td></tr>
+      <tr><td>Veri Münhasıriyeti</td><td>${val(reg.excl)}${reg.exclexp?' (bitiş: '+reg.exclexp+')':''}</td></tr>
+    </tbody></table>`;
+    if(!empty(reg.competition)) html+=`<h4>Rekabet Durumu</h4><p style="font-size:12px">${reg.competition}</p>`;
+  } else {
+    html+=`<p class="exec-empty">Regülatör bilgisi girilince bu bölüm oluşur.</p>`;
+  }
+
+  // ── 8. Literatür Araştırması ────────────────────────────────────────────────
+  const litPapers  = lit.papers  || [];
+  const litPatents = lit.patents || [];
+  const litSug     = lit.suggestion || null;
+
+  html += `<h3>8. Literatür Araştırması (PubMed)</h3>`;
+  if(litPapers.length) {
+    html+=`<table><thead><tr><th>#</th><th>Makale Başlığı</th><th>Yazarlar</th><th>Dergi</th><th>Yıl</th><th>PMID</th></tr></thead><tbody>`;
+    litPapers.slice(0,8).forEach((p,i)=>{
+      html+=`<tr>
+        <td>${i+1}</td>
+        <td><strong>${(p.title||'—').substring(0,85)}${(p.title||'').length>85?'…':''}</strong></td>
+        <td style="font-size:10.5px">${p.authors||'—'}</td>
+        <td style="font-size:10.5px"><em>${p.journal||'—'}</em></td>
+        <td>${p.year||'—'}</td>
+        <td style="font-size:10.5px">${p.pmid||'—'}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table>`;
+    if(litPapers.length>8) html+=`<p style="font-size:11px;color:#888">+${litPapers.length-8} ek makale Literatür & Patent panelinde görüntülenebilir.</p>`;
+  } else {
+    html+=`<p class="exec-empty">📚 Literatür & Patent butonuyla PubMed araması yapılınca bu bölüm dolar.</p>`;
+  }
+
+  // ── 9. Patent Taraması ──────────────────────────────────────────────────────
+  html += `<h3>9. Patent Taraması (PatentsView)</h3>`;
+  if(litPatents.length) {
+    html+=`<table><thead><tr><th>#</th><th>Patent Başlığı</th><th>No</th><th>Yıl</th><th>Hak Sahibi</th></tr></thead><tbody>`;
+    litPatents.slice(0,6).forEach((p,i)=>{
+      const assignee = (p.assignees||[]).map(a=>a.assignee_organization).filter(Boolean).join(', ')||'—';
+      html+=`<tr>
+        <td>${i+1}</td>
+        <td>${(p.patent_title||'—').substring(0,80)}${(p.patent_title||'').length>80?'…':''}</td>
+        <td style="font-size:10.5px">US${p.patent_number||'—'}</td>
+        <td>${(p.patent_date||'').substring(0,4)||'—'}</td>
+        <td style="font-size:10.5px">${assignee.substring(0,55)}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table>`;
+    const firstAbs = litPatents.find(p=>p.patent_abstract);
+    if(firstAbs) {
+      html+=`<div style="margin-top:8px;padding:10px;background:#FAFAFA;border-left:3px solid #2E75B6;font-size:11px;color:#444">
+        <strong>Öne Çıkan Patent (US${firstAbs.patent_number}):</strong><br>
+        ${firstAbs.patent_abstract.substring(0,500)}${firstAbs.patent_abstract.length>500?'…':''}
+      </div>`;
+    }
+  } else {
+    html+=`<p class="exec-empty">📚 Literatür & Patent butonuyla patent araması yapılınca bu bölüm dolar.</p>`;
+  }
+
+  // ── 10. Önerilen Formülasyon & Üretim Yöntemi ──────────────────────────────
+  html += `<h3>10. Önerilen Formülasyon Stratejisi & Üretim Yöntemi</h3>`;
+  if(litSug) {
+    html+=`<p style="font-size:12px;background:#EFF6FF;padding:8px 12px;border-radius:5px;border-left:3px solid #2E75B6;margin-bottom:10px">
+      <strong>${litSug.method} — ${litSug.title}</strong><br>
+      <em>${litSug.rationale}</em>
+    </p>`;
+    html+=`<table><thead><tr><th>#</th><th>Bileşen</th><th>Fonksiyon / Rol</th><th>Hedef Aralık (% w/w)</th></tr></thead><tbody>`;
+    litSug.excipients.forEach((e,i)=>{
+      html+=`<tr ${i===0?'style="background:#EFF6FF"':''}>
+        <td>${i+1}</td>
+        <td><strong>${e.name}</strong></td>
+        <td>${e.role}</td>
+        <td>${e.range}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table>`;
+    html+=`<p style="margin-top:8px"><strong>Üretim Yöntemi:</strong> <span style="background:#E2EFDA;color:#1A5C38;padding:2px 10px;border-radius:4px;font-weight:600">${litSug.method}</span></p>`;
+    html+=`<p style="font-size:10.5px;color:#888;margin-top:4px">Kural-tabanlı BCS öneri motorudur. DSC, FT-IR, çözünürlük çalışmaları ve pilot batch ile doğrulanmalıdır.</p>`;
+  } else {
+    html+=`<p class="exec-empty">📚 Literatür & Patent araması sonrası BCS sınıfına göre formülasyon önerisi burada görünür.</p>`;
+  }
+
+  // ── 11. Risk Değerlendirmesi ────────────────────────────────────────────────
+  html += `<h3>11. Risk Değerlendirmesi</h3>`;
+  const riskAreas = [
+    {key:'form', label:'Formülasyon / Katı Hal', noteKey:'form_note'},
+    {key:'anal', label:'Analitik Metot Geliştirme', noteKey:'anal_note'},
+    {key:'reg',  label:'Regülatör / Başvuru', noteKey:'reg_note'},
+    {key:'ip',   label:'IP / Patent', noteKey:'ip_note'},
+    {key:'mkt',  label:'Pazar / Rekabet', noteKey:'mkt_note'},
+  ];
+  const hasRisk = riskAreas.some(r=>!empty(risk[r.key]));
+  if(hasRisk) {
+    html+=`<table><thead><tr><th>Risk Alanı</th><th>Seviye</th><th>Azaltma Stratejisi</th></tr></thead><tbody>`;
+    riskAreas.forEach(r=>{
+      html+=`<tr><td><strong>${r.label}</strong></td><td>${riskBadge(risk[r.key])}</td><td>${val(risk[r.noteKey],'Belirtilmedi')}</td></tr>`;
+    });
+    html+=`</tbody></table>`;
+    const rc={H:0,M:0,L:0};
+    riskAreas.forEach(r=>{if(risk[r.key])rc[risk[r.key]]++;});
+    html+=`<p style="margin-top:8px"><strong>Genel Risk:</strong> ${riskBadge(rc.H>0?'H':rc.M>0?'M':'L')} ${rc.H>0?'Yüksek':rc.M>1?'Orta-Yüksek':rc.M>0?'Orta':'Düşük'}</p>`;
+  } else {
+    html+=`<p class="exec-empty">Risk değerlendirmesi girilince risk matrisi oluşur.</p>`;
+  }
+
+  // ── Kapak sonu ──────────────────────────────────────────────────────────────
+  html+=`<div style="margin-top:28px;padding-top:12px;border-top:1px solid #ddd;font-size:10px;color:#aaa;text-align:center;font-family:Arial,sans-serif">
+    GİZLİDİR — FormDev pre-formülasyon modülü tarafından otomatik üretilmiştir. ${today}. ICH Q8(R2) referans alınmıştır.
+  </div>`;
+
+  wrap.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MOLEKÜl OTOMATİK ARAMA (PubChem + OpenFDA + ChEMBL)
+// ═══════════════════════════════════════════════════════════════════════════
+async function searchMolecule() {
+  const nameEl = document.getElementById('ex-mol-name');
+  const name = nameEl?.value?.trim();
+  if(!name) { molStatus('Lütfen bir molekül adı girin.', 'error'); return; }
+
+  const btn = document.getElementById('mol-search-btn');
+  if(btn) btn.disabled = true;
+  molStatus(`"${name}" aranıyor… PubChem sorgulanıyor`, 'loading');
+
+  try {
+    const results = await Promise.allSettled([
+      fetchPubChem(name),
+      fetchOpenFDA(name),
+      fetchChEMBL(name),
+    ]);
+
+    const pubchem = results[0].status === 'fulfilled' ? results[0].value : null;
+    const fda    = results[1].status === 'fulfilled' ? results[1].value : null;
+    const chembl = results[2].status === 'fulfilled' ? results[2].value : null;
+
+    if(!pubchem && !fda && !chembl) {
+      molStatus(`"${name}" için veri bulunamadı. Molekül adını kontrol edin.`, 'error');
+      if(btn) btn.disabled = false;
+      return;
+    }
+
+    // Merge & fill
+    const filled = [];
+
+    if(pubchem) {
+      if(pubchem.MolecularFormula) { setExField('mol','formula', pubchem.MolecularFormula); filled.push('Formül'); }
+      if(pubchem.MolecularWeight)  { setExField('mol','mw', parseFloat(pubchem.MolecularWeight).toFixed(2)); filled.push('MW'); }
+      if(pubchem.IUPACName)        { setExField('mol','chem', pubchem.IUPACName); filled.push('IUPAC adı'); }
+      if(pubchem.XLogP != null)    { setExField('mol','logp', pubchem.XLogP); filled.push('logP'); }
+      // BCS estimate heuristic
+      const mw  = parseFloat(pubchem.MolecularWeight) || 0;
+      const lp  = parseFloat(pubchem.XLogP) || 0;
+      const hbd = parseInt(pubchem.HBondDonorCount) || 0;
+      const hba = parseInt(pubchem.HBondAcceptorCount) || 0;
+      const tpsa= parseFloat(pubchem.TPSA) || 0;
+      // High permeability: logP 1-3 or TPSA<75 or HBD<3
+      const highPerm = lp > 1 || tpsa < 75 || hbd < 3;
+      // High solubility heuristic: low MW, low logP, hydrophilic
+      const highSol = mw < 500 && lp < 2 && hba < 10;
+      let bcs = '';
+      if(highSol && highPerm) bcs = 'Sınıf I — Yüksek çözünürlük, yüksek geçirgenlik';
+      else if(!highSol && highPerm) bcs = 'Sınıf II — Düşük çözünürlük, yüksek geçirgenlik';
+      else if(highSol && !highPerm) bcs = 'Sınıf III — Yüksek çözünürlük, düşük geçirgenlik';
+      else bcs = 'Sınıf IV — Düşük çözünürlük, düşük geçirgenlik';
+      if(bcs) { setExSelectField('mol','bcs', bcs); filled.push('BCS sınıfı (tahmin)'); }
+    }
+
+    if(chembl) {
+      if(chembl.pka)         { setExField('mol','pka', chembl.pka); filled.push('pKa'); }
+      if(chembl.indication)  { setExField('mol','indication', chembl.indication); filled.push('Endikasyon'); }
+      if(chembl.moa)         { setExField('mol','moa', chembl.moa); filled.push('Etki mekanizması'); }
+      if(chembl.mp)          { setExField('mol','mp', chembl.mp); filled.push('Erime noktası'); }
+    }
+
+    if(fda) {
+      if(fda.indication && !ST.exec.mol?.indication) { setExField('mol','indication', fda.indication); filled.push('Endikasyon (FDA)'); }
+      if(fda.moa && !ST.exec.mol?.moa)               { setExField('mol','moa', fda.moa); filled.push('Etki mek. (FDA)'); }
+      if(fda.brand)    { setExField('ref','brand', fda.brand); filled.push('Marka adı'); }
+      if(fda.mah)      { setExField('ref','mah', fda.mah); filled.push('MAH'); }
+    }
+
+    // Enhanced ref product lookup: drugs@FDA NDA endpoint
+    try {
+      const refData = await fetchRefProductFDA(name);
+      if(refData) {
+        if(refData.brand    && !ST.exec.ref?.brand)    { setExField('ref','brand',    refData.brand);    filled.push('Ticari ad'); }
+        if(refData.mah      && !ST.exec.ref?.mah)      { setExField('ref','mah',      refData.mah);      filled.push('Ruhsat sahibi'); }
+        if(refData.form     && !ST.exec.ref?.form)     { setExField('ref','form',     refData.form);     filled.push('Doz formu'); }
+        if(refData.strength && !ST.exec.ref?.strength) { setExField('ref','strength', refData.strength); filled.push('Güç'); }
+        if(refData.route)                              { setExField('ref','route',    refData.route);    }
+        if(refData.appNo)                              { setExField('ref','appNo',    refData.appNo);    }
+        if(refData.atc      && !ST.exec.ref?.atc)      { setExField('ref','atc',      refData.atc);      filled.push('ATC'); }
+        if(refData.approvalDate && !ST.exec.ref?.date) { setExField('ref','date',     refData.approvalDate); filled.push('Ruhsat yılı'); }
+        if(refData.pk       && !ST.exec.ref?.pk)       { setExField('ref','pk',       refData.pk);       filled.push('PK bilgisi'); }
+      }
+    } catch(_) {}
+
+    if(filled.length > 0) {
+      molStatus(`✓ ${filled.length} alan dolduruldu: ${filled.join(', ')}. Eksik alanları manuel tamamlayın.`, 'success');
+    } else {
+      molStatus('Veri bulundu ancak eşleştirilebilecek alan yok. Manuel giriş yapın.', 'error');
+    }
+    scheduleExecPreview();
+    autoSave();
+  } catch(e) {
+    molStatus('Arama sırasında hata: ' + e.message, 'error');
+  }
+  if(btn) btn.disabled = false;
+}
+
+function molStatus(msg, type) {
+  const el = document.getElementById('mol-search-status');
+  if(!el) return;
+  el.textContent = msg;
+  el.className = 'search-status ' + type;
+}
+
+function setExField(sec, field, val) {
+  if(!ST.exec[sec]) ST.exec[sec] = {};
+  ST.exec[sec][field] = String(val);
+  const el = document.getElementById(`ex-${sec}-${field}`);
+  if(el) {
+    el.value = String(val);
+    el.classList.add('field-filled');
+    setTimeout(() => el.classList.remove('field-filled'), 2000);
+  }
+}
+
+function setExSelectField(sec, field, val) {
+  if(!ST.exec[sec]) ST.exec[sec] = {};
+  ST.exec[sec][field] = val;
+  const el = document.getElementById(`ex-${sec}-${field}`);
+  if(el) {
+    // Try to match option
+    Array.from(el.options).forEach(o => {
+      if(o.value === val || o.text === val) o.selected = true;
+    });
+    el.classList.add('field-filled');
+    setTimeout(() => el.classList.remove('field-filled'), 2000);
+  }
+}
+
+// ── PubChem PUG REST ─────────────────────────────────────────────────────────
+async function fetchPubChem(name) {
+  const props = 'MolecularFormula,MolecularWeight,IUPACName,XLogP,HBondDonorCount,HBondAcceptorCount,TPSA,RotatableBondCount';
+  const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(name)}/property/${props}/JSON`;
+  const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+  if(!r.ok) return null;
+  const d = await r.json();
+  return d?.PropertyTable?.Properties?.[0] || null;
+}
+
+// ── OpenFDA drug label ────────────────────────────────────────────────────────
+async function fetchOpenFDA(name) {
+  const url = `https://api.fda.gov/drug/label.json?search=openfda.generic_name:"${encodeURIComponent(name)}"&limit=1`;
+  const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+  if(!r.ok) return null;
+  const d = await r.json();
+  const result = d?.results?.[0];
+  if(!result) return null;
+
+  const first = arr => Array.isArray(arr) ? arr[0]?.substring(0, 500) : null;
+  const brand = result?.openfda?.brand_name?.[0] || null;
+  const mah   = result?.openfda?.manufacturer_name?.[0] || null;
+  const indication = first(result.indications_and_usage);
+  const moa        = first(result.mechanism_of_action);
+  return {brand, mah, indication, moa};
+}
+
+// ── ChEMBL ───────────────────────────────────────────────────────────────────
+async function fetchChEMBL(name) {
+  // Search molecule
+  const searchUrl = `https://www.ebi.ac.uk/chembl/api/data/molecule?pref_name__iexact=${encodeURIComponent(name)}&format=json&limit=1`;
+  const r = await fetch(searchUrl, {signal: AbortSignal.timeout(8000)});
+  if(!r.ok) return null;
+  const d = await r.json();
+  const mol = d?.molecules?.[0];
+  if(!mol) return null;
+
+  const props = mol.molecule_properties || {};
+  const moa_raw = mol.molecule_mechanisms?.[0]?.mechanism_of_action || null;
+
+  // Fetch drug indication from ChEMBL
+  let indication = null;
+  try {
+    const chemblId = mol.molecule_chembl_id;
+    const indUrl = `https://www.ebi.ac.uk/chembl/api/data/drug_indication?molecule_chembl_id=${chemblId}&format=json&limit=3`;
+    const ir = await fetch(indUrl, {signal: AbortSignal.timeout(5000)});
+    if(ir.ok) {
+      const id = await ir.json();
+      const inds = id?.drug_indications?.map(i => i.mesh_heading).filter(Boolean);
+      if(inds?.length) indication = inds.join('; ');
+    }
+  } catch(_) {}
+
+  return {
+    pka:  props.alogp ? null : null,  // ChEMBL doesn't expose pKa directly
+    logp: props.alogp || null,
+    mw:   props.full_mwt || null,
+    mp:   null,
+    moa:  moa_raw,
+    indication,
+  };
+}
+
+
+// ── FDA drugs@FDA (NDA originator lookup) ───────────────────────────────────
+async function fetchRefProductFDA(name) {
+  try {
+    // drugs@FDA: prefers NDA (originator) over ANDA
+    const appUrl = `https://api.fda.gov/drug/drugsfda.json?search=openfda.generic_name:"${encodeURIComponent(name)}"&limit=5`;
+    const ar = await fetch(appUrl, {signal: AbortSignal.timeout(8000)});
+    if(ar.ok) {
+      const ad = await ar.json();
+      const results = ad?.results || [];
+      const nda = results.find(r => r.application_number?.startsWith('NDA')) || results[0];
+      if(nda) {
+        const prod     = nda.products?.[0] || {};
+        const ai       = prod.active_ingredients?.[0] || {};
+        const brand    = prod.brand_name || null;
+        const mah      = nda.sponsor_name || null;
+        const form     = prod.dosage_form || null;
+        const strength = ai.strength || null;
+        const route    = prod.route || null;
+        const appNo    = nda.application_number || null;
+        const appDate  = nda.submissions?.find(s=>s.submission_type==='ORIG')?.submission_status_date?.substring(0,4) || null;
+
+        // PK from drug label
+        let pk = null;
+        try {
+          const pkUrl = `https://api.fda.gov/drug/label.json?search=openfda.brand_name:"${encodeURIComponent(brand||name)}"&limit=1`;
+          const pkr = await fetch(pkUrl, {signal: AbortSignal.timeout(6000)});
+          if(pkr.ok) {
+            const pkd = await pkr.json();
+            const lbl = pkd?.results?.[0];
+            if(lbl?.clinical_pharmacology) pk = lbl.clinical_pharmacology[0]?.substring(0,600) || null;
+            else if(lbl?.pharmacokinetics)  pk = lbl.pharmacokinetics[0]?.substring(0,600) || null;
+          }
+        } catch(_) {}
+
+        // ATC from ChEMBL
+        let atc = null;
+        try {
+          const atcUrl = `https://www.ebi.ac.uk/chembl/api/data/molecule?pref_name__iexact=${encodeURIComponent(name)}&format=json&limit=1`;
+          const atcr = await fetch(atcUrl, {signal: AbortSignal.timeout(5000)});
+          if(atcr.ok) {
+            const atcd = await atcr.json();
+            atc = atcd?.molecules?.[0]?.atc_classifications?.[0] || null;
+          }
+        } catch(_) {}
+
+        return { brand, mah, form, strength, route, appNo, approvalDate: appDate, pk, atc };
+      }
+    }
+  } catch(_) {}
+  return null;
+}
+
+function calcCarr() {
+  const bulk = parseFloat(document.getElementById('ex-mol-bulkdens')?.value);
+  const tap  = parseFloat(document.getElementById('ex-mol-tapdens')?.value);
+  const el   = document.getElementById('ex-mol-carr');
+  if(!el) return;
+  if(bulk > 0 && tap > 0 && tap >= bulk) {
+    const carr = ((tap - bulk) / tap * 100).toFixed(1);
+    el.value = carr;
+    if(!ST.exec.mol) ST.exec.mol = {};
+    ST.exec.mol.carr = carr;
+    scheduleExecPreview();
+  }
+}
+
+function collectExecInputs() {
+  Object.entries(EXEC_FIELDS).forEach(([sec, fields]) => {
+    fields.forEach(f => {
+      const el = document.getElementById(`ex-${sec}-${f}`);
+      if(el) {
+        if(!ST.exec[sec]) ST.exec[sec] = {};
+        ST.exec[sec][f] = el.value;
+      }
+    });
+  });
+}
+
+function printExec() {
+  const wrap = document.getElementById('exec-preview');
+  if(!wrap) return;
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Pre-Formülasyon Raporu</title>
+    <style>
+      body{font-family:Georgia,serif;font-size:12pt;color:#111;padding:32px 48px;max-width:800px;margin:0 auto}
+      h2{font-size:18pt;color:#1F3864;margin-bottom:4px}
+      h3{font-size:11pt;text-transform:uppercase;letter-spacing:.6px;color:#1F3864;border-bottom:1px solid #ccc;padding-bottom:3px;margin-top:24px}
+      h4{font-size:11pt;color:#2E75B6;margin:12px 0 4px}
+      table{width:100%;border-collapse:collapse;font-size:10pt;margin:10px 0}
+      th{background:#1F3864;color:#fff;padding:5px 8px;text-align:left;font-size:9pt;text-transform:uppercase}
+      td{padding:5px 8px;border:1px solid #ddd}
+      tr:nth-child(even) td{background:#f8f8f8}
+      .risk-H{background:#FFE0E0;color:#7B1515;padding:1px 6px;border-radius:3px;font-weight:700}
+      .risk-M{background:#FFF2CC;color:#7F6000;padding:1px 6px;border-radius:3px;font-weight:700}
+      .risk-L{background:#E2EFDA;color:#1A5C38;padding:1px 6px;border-radius:3px;font-weight:700}
+      .doc-subtitle{color:#666;font-size:10pt;border-bottom:2px solid #1F3864;padding-bottom:12px;margin-bottom:16px}
+    
+/* ── TRANSLATION PAGE ──────────────────────────────────────── */
+.tr-upload-zone{
+  border:2px dashed #334155;border-radius:10px;padding:32px;text-align:center;
+  cursor:pointer;transition:.2s;background:#0F172A;color:#94A3B8;
+}
+.tr-upload-zone:hover,.tr-upload-zone.dragover{border-color:#2E75B6;background:#1E293B;color:#60A5FA}
+.tr-upload-zone .up-icon{font-size:36px;margin-bottom:8px}
+.tr-upload-zone p{margin:4px 0;font-size:13px}
+.tr-upload-zone .up-hint{font-size:11px;color:#64748B;margin-top:6px}
+.tr-extracted{
+  background:#0F172A;border:1px solid #334155;border-radius:8px;
+  padding:14px;font-size:12px;color:#CBD5E1;max-height:260px;overflow-y:auto;
+  white-space:pre-wrap;line-height:1.6;font-family:monospace;
+}
+.tr-output{
+  background:#fff;border:1px solid #CBD5E1;border-radius:8px;
+  padding:16px;font-size:13px;color:#111;min-height:220px;max-height:440px;
+  overflow-y:auto;line-height:1.75;white-space:pre-wrap;outline:none;
+  font-family:Georgia,'Times New Roman',serif;
+}
+.tr-lang-select{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:12px}
+.tr-arrow{font-size:20px;text-align:center;color:#64748B}
+.tr-std-btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.tr-std-btn{
+  padding:5px 14px;border-radius:20px;border:1.5px solid #334155;
+  background:transparent;color:#94A3B8;font-size:11px;font-weight:600;
+  cursor:pointer;transition:.15s;
+}
+.tr-std-btn.active,.tr-std-btn:hover{border-color:#2E75B6;background:#1E3A5F;color:#60A5FA}
+.tr-progress{height:4px;background:#1E293B;border-radius:2px;overflow:hidden;margin:8px 0;display:none}
+.tr-progress-bar{height:100%;background:linear-gradient(90deg,#2E75B6,#60A5FA);transition:width .3s}
+.tr-status-msg{font-size:12px;color:#94A3B8;min-height:18px;margin:4px 0}
+.tr-glossary-table{font-size:11.5px}
+.tr-glossary-table th{background:#1E293B;color:#94A3B8;padding:6px 10px;text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.tr-glossary-table td{padding:5px 10px;border:1px solid #1E293B;color:#CBD5E1}
+.tr-glossary-table tr:nth-child(even) td{background:#0F172A}
+.apikey-row{display:flex;gap:8px;align-items:center}
+.apikey-row input{flex:1;background:#0F172A;border:1.5px solid #334155;color:#F1F5F9;padding:7px 10px;border-radius:6px;font-size:12px}
+.apikey-row input:focus{outline:none;border-color:#2E75B6}
+.tr-word-count{font-size:11px;color:#64748B;text-align:right;margin-top:4px}
+
+</style></head><body>${wrap.innerHTML}</body></html>`);
+  win.document.close();
+  win.print();
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LİTERATÜR, PATENT & FORMÜLASYON ÖNERİSİ
+// ═══════════════════════════════════════════════════════════════════════════
+async function searchLiteratureAndPatents() {
+  const nameEl = document.getElementById('ex-mol-name');
+  const name = nameEl?.value?.trim();
+  if(!name) { molStatus('Önce molekül adı girin.', 'error'); return; }
+
+  const btn = document.getElementById('lit-search-btn');
+  if(btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Aranıyor…'; }
+
+  // Show panel
+  const panel = document.getElementById('lit-panel');
+  if(panel) panel.classList.add('visible');
+
+  molStatus(`"${name}" için literatür ve patent taranıyor…`, 'loading');
+
+  const [papers, patents] = await Promise.allSettled([
+    fetchPubMedPapers(name),
+    fetchPatentsView(name),
+  ]);
+
+  const papersArr  = papers.status==='fulfilled'  ? papers.value  : [];
+  const patentsArr = patents.status==='fulfilled' ? patents.value : [];
+
+  renderPapers(papersArr);
+  renderPatents(patentsArr);
+  renderFormulationSuggestion(name);
+
+  // Store in ST for exec preview
+  if(!ST.exec) ST.exec = {};
+  ST.exec.lit = {
+    papers:  papersArr,
+    patents: patentsArr,
+    suggestion: window._formulaSuggestions ? window._formulaSuggestions[0] : null,
+  };
+  scheduleExecPreview();
+  autoSave();
+
+  const pc  = papersArr.length;
+  const ptc = patentsArr.length;
+  molStatus(`✓ ${pc} makale, ${ptc} patent bulundu. Formülasyon önerisi oluşturuldu.`, 'success');
+
+  if(btn) { btn.disabled = false; btn.innerHTML = '📚 Literatür & Patent'; }
+}
+
+// ── PubMed ────────────────────────────────────────────────────────────────────
+async function fetchPubMedPapers(name) {
+  // Step 1: search IDs
+  const searchQ = encodeURIComponent(`${name}[Title/Abstract] AND (tablet OR formulation OR dissolution OR bioequivalence)[Title/Abstract]`);
+  const searchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${searchQ}&retmax=8&retmode=json&sort=relevance`;
+  const sr = await fetch(searchUrl, {signal: AbortSignal.timeout(8000)});
+  if(!sr.ok) return [];
+  const sd = await sr.json();
+  const ids = sd?.esearchresult?.idlist || [];
+  if(!ids.length) return [];
+
+  // Step 2: fetch summaries
+  const summaryUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json`;
+  const sumr = await fetch(summaryUrl, {signal: AbortSignal.timeout(8000)});
+  if(!sumr.ok) return [];
+  const sumd = await sumr.json();
+  const result = sumd?.result || {};
+
+  return ids.map(id => {
+    const doc = result[id];
+    if(!doc) return null;
+    return {
+      title: doc.title || '—',
+      authors: (doc.authors||[]).slice(0,3).map(a=>a.name).join(', ') + (doc.authors?.length>3?' et al.':''),
+      journal: doc.fulljournalname || doc.source || '',
+      year: doc.pubdate?.substring(0,4) || '',
+      pmid: id,
+      doi: doc.elocationid || '',
+    };
+  }).filter(Boolean);
+}
+
+// ── PatentsView ───────────────────────────────────────────────────────────────
+async function fetchPatentsView(name) {
+  const body = JSON.stringify({
+    q: {"_text_phrase":{"patent_title": name}},
+    f: ["patent_number","patent_title","patent_date","patent_abstract","assignee_organization"],
+    o: {"per_page": 6, "sort":[{"patent_date":"desc"}]}
+  });
+  try {
+    const r = await fetch('https://api.patentsview.org/patents/query', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body,
+      signal: AbortSignal.timeout(9000)
+    });
+    if(!r.ok) throw new Error('PatentsView error');
+    const d = await r.json();
+    const patents = d?.patents || [];
+    if(patents.length) return patents;
+  } catch(_) {}
+
+  // Fallback: keyword in abstract
+  const body2 = JSON.stringify({
+    q: {"_and":[
+      {"_text_phrase":{"patent_abstract": name}},
+      {"_text_any":{"patent_abstract":"formulation tablet pharmaceutical"}}
+    ]},
+    f: ["patent_number","patent_title","patent_date","patent_abstract","assignee_organization"],
+    o: {"per_page": 6, "sort":[{"patent_date":"desc"}]}
+  });
+  try {
+    const r2 = await fetch('https://api.patentsview.org/patents/query', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: body2, signal: AbortSignal.timeout(9000)
+    });
+    if(!r2.ok) return [];
+    const d2 = await r2.json();
+    return d2?.patents || [];
+  } catch(_) { return []; }
+}
+
+// ── Render papers ─────────────────────────────────────────────────────────────
+function renderPapers(papers) {
+  const body = document.getElementById('lit-papers-body');
+  const cnt  = document.getElementById('lit-paper-count');
+  if(!body) return;
+  if(!papers.length) {
+    body.innerHTML = '<p style="color:var(--gray-dark);font-size:12px">Yeterli makale bulunamadı. Farklı bir isimle deneyin.</p>';
+    return;
+  }
+  if(cnt) cnt.textContent = `— ${papers.length} makale`;
+  body.innerHTML = papers.map(p => `
+    <div class="paper-item">
+      <div class="paper-title">${p.title}</div>
+      <div class="paper-meta">${p.authors}${p.journal?' · <em>'+p.journal+'</em>':''}${p.year?' · '+p.year:''}</div>
+      <a class="paper-link" href="https://pubmed.ncbi.nlm.nih.gov/${p.pmid}" target="_blank">PubMed: ${p.pmid}</a>
+      ${p.doi?` · <span class="paper-meta">${p.doi}</span>`:''}
+    </div>`).join('');
+}
+
+// ── Render patents ────────────────────────────────────────────────────────────
+function renderPatents(patents) {
+  const body = document.getElementById('lit-patents-body');
+  const cnt  = document.getElementById('lit-patent-count');
+  if(!body) return;
+  if(!patents.length) {
+    body.innerHTML = '<p style="color:var(--gray-dark);font-size:12px">Patent bulunamadı veya API erişilemedi.</p>';
+    return;
+  }
+  if(cnt) cnt.textContent = `— ${patents.length} patent`;
+  body.innerHTML = patents.map(p => `
+    <div class="patent-item">
+      <div class="patent-title">${p.patent_title||'—'}</div>
+      <div class="patent-meta">
+        No: <strong>${p.patent_number||'—'}</strong> · 
+        Tarih: ${(p.patent_date||'').substring(0,4)||'—'} · 
+        Sahibi: ${(p.assignees||[]).map(a=>a.assignee_organization).filter(Boolean).join(', ')||'—'}
+      </div>
+      ${p.patent_abstract?`<div class="paper-meta" style="margin-top:3px">${p.patent_abstract.substring(0,200)}…</div>`:''}
+      <a class="paper-link" href="https://patents.google.com/patent/US${p.patent_number}" target="_blank">Google Patents'ta aç ↗</a>
+    </div>`).join('');
+}
+
+// ── Formulation suggestion engine ─────────────────────────────────────────────
+function renderFormulationSuggestion(name) {
+  const body = document.getElementById('lit-formula-body');
+  if(!body) return;
+
+  const mol  = ST.exec?.mol || {};
+  const bcs  = mol.bcs || '';
+  const mw   = parseFloat(mol.mw) || 0;
+  const logp = parseFloat(mol.logp) || 0;
+  const pka  = parseFloat(mol.pka) || null;
+  const bcsNum = bcs.includes('I') ? (bcs.includes('II')?(bcs.includes('III')?3:2):1) : (bcs.includes('IV')?4:0);
+
+  // Rule-based suggestion engine
+  const suggestions = buildFormulationSuggestions(bcsNum, mw, logp, pka, name);
+
+  let html = `<div style="margin-bottom:10px;font-size:12px;color:var(--gray-dark)">
+    BCS <strong>${bcs||'Belirsiz'}</strong> — MW: <strong>${mw||'?'} g/mol</strong> — logP: <strong>${logp||'?'}</strong>
+    ${pka?'— pKa: <strong>'+pka+'</strong>':''}
+  </div>`;
+
+  html += `<div class="formula-suggest-grid">`;
+
+  suggestions.approaches.forEach((approach, i) => {
+    html += `
+    <div class="suggest-card">
+      <div class="method-badge">${approach.method}</div>
+      <h5>${approach.title}</h5>
+      <ul>
+        ${approach.excipients.map(e=>`<li><strong>${e.name}</strong> — ${e.role} <em>(${e.range})</em></li>`).join('')}
+      </ul>
+      <div style="margin-top:8px;font-size:11px;color:var(--gray-dark)">${approach.rationale}</div>
+      <button class="apply-formula-btn" onclick="applyFormulaToPage(${i})">➕ Birim Formül Sayfasına Uygula</button>
+    </div>`;
+  });
+
+  html += `</div>`;
+
+  if(suggestions.warnings.length) {
+    html += `<div style="margin-top:12px;padding:10px;background:var(--yellow);border-radius:6px;border-left:3px solid var(--dark-yel)">
+      <strong style="font-size:12px;color:var(--dark-yel)">⚠️ Dikkat Noktaları</strong><br>
+      <ul style="margin:4px 0 0;padding-left:16px;font-size:11.5px">${suggestions.warnings.map(w=>`<li>${w}</li>`).join('')}</ul>
+    </div>`;
+  }
+
+  body.innerHTML = html;
+  // Store suggestions for apply function
+  window._formulaSuggestions = suggestions.approaches;
+}
+
+function buildFormulationSuggestions(bcsNum, mw, logp, pka, apiName) {
+  const warnings = [];
+  const approaches = [];
+
+  if(mw > 500) warnings.push('MW > 500 Da — Lipinski kural ihlali. Oral biyoyararlanım riski.');
+  if(logp > 5)  warnings.push('logP > 5 — Yüksek lipofilite. Suda çözünürlük sorunları öngörülüyor.');
+  if(logp < 0)  warnings.push('logP < 0 — Hidrofilik. Membran geçirgenliği düşük olabilir.');
+  if(pka && pka < 3) warnings.push(`pKa ${pka} — Güçlü asit. pH-bağımlı çözünürlük profili beklenmeli.`);
+  if(pka && pka > 10) warnings.push(`pKa ${pka} — Güçlü baz. Tuz formu değerlendirin.`);
+
+  // BCS Class I or unknown — Direct Compression
+  if(bcsNum === 1 || bcsNum === 0) {
+    approaches.push({
+      method: 'Direkt Kompresyon',
+      title: 'Standart Tablet (BCS I)',
+      rationale: 'BCS Sınıf I moleküller için en basit ve ekonomik yöntem. Isıya ve neme duyarlılık düşükse tercih edilir.',
+      excipients: [
+        {name: apiName||'API', role:'Aktif madde', range:'30–50% w/w'},
+        {name:'Mikrokristal Selüloz (MCC PH 102)', role:'Dolgu/Bağlayıcı', range:'30–45% w/w'},
+        {name:'Laktoz Monohidrat 200M', role:'Dolgu', range:'10–20% w/w'},
+        {name:'Croscarmellose Sodium', role:'Dağıltıcı', range:'2–5% w/w'},
+        {name:'Kolloidal SiO₂ (Aerosil 200)', role:'Akış düzenleyici', range:'0.5–1% w/w'},
+        {name:'Magnezyum Stearat', role:'Kayganlayıcı', range:'0.5–1% w/w'},
+        {name:'Opadry II', role:'Film kaplama', range:'3–4% w/w (coat)'},
+      ]
+    });
+    approaches.push({
+      method: 'Islak Granülasyon',
+      title: 'Granüle Tablet (BCS I)',
+      rationale: 'Yüksek API yükleme oranı, akış ve içerik tekdüzeliği kritik ise tercih edilir.',
+      excipients: [
+        {name: apiName||'API', role:'Aktif madde', range:'30–50% w/w'},
+        {name:'MCC PH 101', role:'Dolgu/Bağlayıcı', range:'25–35% w/w'},
+        {name:'Laktoz Monohidrat', role:'Dolgu', range:'10–15% w/w'},
+        {name:'Povidon K30 (PVP K30)', role:'Bağlayıcı (granülasyon sıvısı)', range:'3–5% w/w'},
+        {name:'Croscarmellose Sodium', role:'Dağıltıcı', range:'3–5% w/w'},
+        {name:'Magnezyum Stearat', role:'Kayganlayıcı', range:'0.5–1% w/w'},
+        {name:'Opadry II', role:'Film kaplama', range:'3–4% w/w (coat)'},
+      ]
+    });
+  }
+
+  // BCS Class II — Low solubility, need enhancement
+  if(bcsNum === 2) {
+    warnings.push('BCS Sınıf II — Çözünürlük artırma stratejisi kritik. Dissolüsyon profili dikkatle tasarlanmalı.');
+    approaches.push({
+      method: 'Islak Granülasyon + Surfaktan',
+      title: 'Çözünürlük Artırıcı Tablet (BCS II)',
+      rationale: 'Surfaktan ve dispersant kullanımı ıslanabilirliği artırır. SLS veya poloxamer tercih edilir.',
+      excipients: [
+        {name: apiName||'API', role:'Aktif madde', range:'30–50% w/w'},
+        {name:'MCC PH 102', role:'Dolgu/Bağlayıcı', range:'25–35% w/w'},
+        {name:'Sodyum Lauril Sülfat (SLS)', role:'Surfaktan / çözünürlük artırıcı', range:'0.5–2% w/w'},
+        {name:'Polivinilpirolidon K30', role:'Bağlayıcı', range:'3–5% w/w'},
+        {name:'Croscarmellose Sodium', role:'Dağıltıcı', range:'4–6% w/w'},
+        {name:'Mannitol DC', role:'Dolgu', range:'5–15% w/w'},
+        {name:'Magnezyum Stearat', role:'Kayganlayıcı', range:'0.5–1% w/w'},
+        {name:'Opadry II', role:'Film kaplama', range:'3–4% w/w'},
+      ]
+    });
+    approaches.push({
+      method: 'Katı Dispersiyon / HME',
+      title: 'Amorf Katı Dispersiyon (BCS II)',
+      rationale: 'logP yüksek kristal yapılı API\'ler için amorf dispersiyon veya HME ideal çözünürlük artışı sağlar.',
+      excipients: [
+        {name: apiName||'API', role:'Aktif madde', range:'20–40% w/w'},
+        {name:'HPMC-AS (Hypromellose Asetat Süksinat)', role:'Matriks polimer', range:'30–50% w/w'},
+        {name:'Soluplus (PVK-VA kopolimer)', role:'Çözünürlük artırıcı', range:'10–20% w/w'},
+        {name:'SDS / Poloxamer 188', role:'Surfaktan', range:'1–3% w/w'},
+        {name:'MCC PH 102', role:'Ekstrüdat granül dolgusu', range:'10–20% w/w'},
+        {name:'Crospovidon (PVPP)', role:'Dağıltıcı', range:'3–5% w/w'},
+        {name:'Magnezyum Stearat', role:'Kayganlayıcı', range:'0.5–1% w/w'},
+      ]
+    });
+    if(logp > 4) warnings.push('logP > 4: Nanopartikül veya lipid bazlı formülasyon alternatif olarak değerlendirilebilir.');
+  }
+
+  // BCS Class III
+  if(bcsNum === 3) {
+    warnings.push('BCS Sınıf III — Biyoeşdeğerlik çalışmasında biyomuafiyet (biowaiver) değerlendirin (EMA/FDA kılavuzları).');
+    approaches.push({
+      method: 'Direkt Kompresyon',
+      title: 'Hızlı Dissolüsyon Tablet (BCS III)',
+      rationale: 'BCS III için dissolüsyon hızı kritik değil; içerik tekdüzeliği ve üretim tekrarlanabilirliği öncelikli.',
+      excipients: [
+        {name: apiName||'API', role:'Aktif madde', range:'30–50% w/w'},
+        {name:'MCC PH 102', role:'Dolgu/Bağlayıcı', range:'35–45% w/w'},
+        {name:'Mannitol DC 200', role:'Dolgu', range:'10–15% w/w'},
+        {name:'Croscarmellose Sodium', role:'Dağıltıcı', range:'2–4% w/w'},
+        {name:'Kolloidal SiO₂', role:'Akış düzenleyici', range:'0.5–1% w/w'},
+        {name:'Magnezyum Stearat (bitkisel)', role:'Kayganlayıcı', range:'0.5–1% w/w'},
+        {name:'Opadry II', role:'Film kaplama', range:'3% w/w'},
+      ]
+    });
+  }
+
+  // BCS Class IV — Most challenging
+  if(bcsNum === 4) {
+    warnings.push('BCS Sınıf IV — En zorlayıcı sınıf. Hem çözünürlük hem geçirgenlik artırımı gerekiyor. Alternatif doz formu değerlendirin.');
+    warnings.push('Lipid bazlı drug delivery systems (LBDDS) veya nanoformülasyon değerlendirin.');
+    approaches.push({
+      method: 'Lipid Bazlı Sistem',
+      title: 'SMEDDS / Soft Capsule (BCS IV)',
+      rationale: 'Self-microemulsifying drug delivery system her iki sorunu da ele alan en etkili yaklaşım.',
+      excipients: [
+        {name: apiName||'API', role:'Aktif madde', range:'10–30% w/w'},
+        {name:'Kolliphor EL (Cremophor EL)', role:'Surfaktan', range:'30–40% w/w'},
+        {name:'Labrasol (Caprylocaproyl PEG-8 Glycerides)', role:'Ko-surfaktan', range:'15–25% w/w'},
+        {name:'Miglyol 812 (Trigliserid)', role:'Yağ fazı', range:'20–30% w/w'},
+        {name:'PEG 400', role:'Ko-solvent', range:'5–15% w/w'},
+      ]
+    });
+    approaches.push({
+      method: 'Islak Granülasyon + Çözeltici',
+      title: 'Çözünürlük+Geçirgenlik Artırıcı Tablet (BCS IV)',
+      rationale: 'Surfaktan ve P-gp inhibitörü kombinasyonu ile her iki bariyer aşılmaya çalışılır.',
+      excipients: [
+        {name: apiName||'API', role:'Aktif madde', range:'20–40% w/w'},
+        {name:'HPMC E5', role:'Bağlayıcı/matriks', range:'15–25% w/w'},
+        {name:'Poloxamer 407', role:'Çözünürlük ve geçirgenlik artırıcı', range:'5–10% w/w'},
+        {name:'Vitamin E TPGS', role:'Surfaktan / P-gp inhibitörü', range:'2–5% w/w'},
+        {name:'MCC PH 102', role:'Dolgu', range:'15–25% w/w'},
+        {name:'Crospovidon', role:'Dağıltıcı', range:'4–6% w/w'},
+        {name:'Magnezyum Stearat', role:'Kayganlayıcı', range:'0.5–1% w/w'},
+      ]
+    });
+  }
+
+  // Generic fallback
+  if(!approaches.length) {
+    approaches.push({
+      method: 'Direkt Kompresyon',
+      title: 'Standart Tablet (BCS Belirsiz)',
+      rationale: 'BCS sınıfı belirlenemedi. Standart direkt kompresyon başlangıç noktası olarak önerilir.',
+      excipients: [
+        {name: apiName||'API', role:'Aktif madde', range:'30–50% w/w'},
+        {name:'Mikrokristal Selüloz (MCC PH 102)', role:'Dolgu/Bağlayıcı', range:'30–40% w/w'},
+        {name:'Laktoz Monohidrat 200M', role:'Dolgu', range:'10–20% w/w'},
+        {name:'Croscarmellose Sodium', role:'Dağıltıcı', range:'2–4% w/w'},
+        {name:'Kolloidal SiO₂', role:'Akış düzenleyici', range:'0.5–1% w/w'},
+        {name:'Magnezyum Stearat', role:'Kayganlayıcı', range:'0.5–1% w/w'},
+      ]
+    });
+  }
+
+  return {approaches, warnings};
+}
+
+// ── Apply formula to formula page ─────────────────────────────────────────────
+function applyFormulaToPage(idx) {
+  const approaches = window._formulaSuggestions;
+  if(!approaches || !approaches[idx]) return;
+  const approach = approaches[idx];
+
+  if(!confirm(`"${approach.title}" formülasyonu Birim Formül sayfasına uygulanacak. Mevcut liste silinecek. Devam?`)) return;
+
+  // Clear existing
+  ST.formula.excipients = [];
+  ST.formula.values = {};
+
+  // Apply suggested excipients
+  approach.excipients.forEach((ex, i) => {
+    const isApi = i === 0;
+    const midPct = ex.range.match(/(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)/);
+    const defaultPct = midPct ? ((parseFloat(midPct[1])+parseFloat(midPct[2]))/2).toFixed(1) : '';
+    ST.formula.excipients.push({
+      name: ex.name,
+      func: ex.role,
+      grade: isApi ? (ST.exec?.mol?.bcs||'Ph.Eur.') : 'Ph.Eur.',
+      isApi
+    });
+    if(defaultPct) {
+      if(!ST.formula.values[i]) ST.formula.values[i] = {};
+      ST.formula.values[i]['D001'] = defaultPct;
+    }
+  });
+
+  // Set production method in process page
+  if(approach.method && !ST.process['D001']) ST.process['D001'] = {};
+  const methodMap = {
+    'Direkt Kompresyon':'Direkt Kompresyon',
+    'Islak Granülasyon':'Islak Granülasyon',
+    'Islak Granülasyon + Surfaktan':'Islak Granülasyon',
+    'Katı Dispersiyon / HME':'Diğer',
+    'Lipid Bazlı Sistem':'Diğer',
+  };
+  if(ST.process['D001']) ST.process['D001'].method = methodMap[approach.method] || 'Diğer';
+
+  saveAll();
+  toast(`✓ "${approach.title}" formülasyonu D001 batch'ine uygulandı!`);
+  showPage('formula');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PROCESS (ÜRETİM YÖNTEMİ)
+// ═══════════════════════════════════════════════════════════════════════════
+const PROCESS_METHODS = ['Direkt Kompresyon','Islak Granülasyon','Kuru Granülasyon','Pelletleme','Diğer'];
+const PROC_FIELDS = [
+  {id:'method',   label:'Üretim Yöntemi',   type:'select', opts:PROCESS_METHODS},
+  {id:'batchSize',label:'Batch Boyutu (tablet)', type:'number'},
+  {id:'coreWt',   label:'Çekirdek Ağırlık (mg)', type:'number'},
+  {id:'coatedWt', label:'Kaplı Tablet Ağırlık (mg)', type:'number'},
+  {id:'hardness', label:'Hedef Sertlik (N)', type:'number'},
+  {id:'coatPct',  label:'Kaplama Miktarı (%)', type:'number'},
+  {id:'coatMat',  label:'Kaplama Materyali', type:'text'},
+  {id:'inletTemp',label:'Inlet Sıcaklık (°C)', type:'number'},
+  {id:'sprayRate',label:'Sprey Hızı (g/dak)',  type:'number'},
+  {id:'panSpeed', label:'Pan Hızı (rpm)',       type:'number'},
+  {id:'equipment',label:'Ekipman Listesi',      type:'text'},
+];
+
+function renderProcess() {
+  const tabsEl = document.getElementById('proc-tabs');
+  const panelsEl = document.getElementById('proc-panels');
+  if(!tabsEl || !panelsEl) return;
+
+  // Build tabs
+  tabsEl.innerHTML = BATCH_IDS.map(b => {
+    const hasData = ST.process[b] && Object.keys(ST.process[b]).length > 0;
+    const activeCls = b === (window._activeProcBatch||BATCH_IDS[0]) ? ' active' : '';
+    const hasCls = hasData ? ' has-data' : '';
+    return `<button class="proc-tab${hasCls}${activeCls}" onclick="switchProcBatch('${b}',this)">${b}</button>`;
+  }).join('');
+
+  // Build all panels
+  let html = '';
+  BATCH_IDS.forEach(b => {
+    const d = ST.process[b] || {};
+    const isActive = b === (window._activeProcBatch||BATCH_IDS[0]);
+    html += `<div class="proc-panel${isActive?' active':''}" id="proc-panel-${b}">`;
+
+    // General info card
+    html += `<div class="card"><div class="card-header" style="background:#374151">⚙️ ${b} — Üretim Bilgileri</div><div class="card-body">`;
+    html += `<div class="form-grid">`;
+    PROC_FIELDS.forEach(f => {
+      const val = d[f.id] || '';
+      html += `<div class="form-group"><label>${f.label}</label>`;
+      if(f.type === 'select') {
+        html += `<select id="proc-${b}-${f.id}" onchange="updateProc('${b}','${f.id}',this.value)">`;
+        f.opts.forEach(o => html += `<option${val===o?' selected':''}>${o}</option>`);
+        html += `</select>`;
+      } else {
+        html += `<input type="${f.type}" value="${val}" id="proc-${b}-${f.id}" oninput="updateProc('${b}','${f.id}',this.value)" placeholder="${f.label}">`;
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+
+    // Process description
+    const desc = d.description || '';
+    html += `<div class="form-group" style="margin-top:10px"><label>Üretim Adımları / Süreç Tanımı</label>
+      <textarea id="proc-${b}-description" rows="4" style="padding:7px;border:1.5px solid #CBD5E1;border-radius:6px;font-size:12px;width:100%;font-family:inherit;resize:vertical"
+        oninput="updateProc('${b}','description',this.value)" placeholder="Karıştırma süresi, granülasyon adımları, sıkıştırma parametreleri, kaplama adımları...">${desc}</textarea></div>`;
+
+    // Rationale
+    const rationale = d.rationale || '';
+    html += `<div class="form-group" style="margin-top:8px"><label>Değişiklik Gerekçesi / Notlar</label>
+      <textarea id="proc-${b}-rationale" rows="3" style="padding:7px;border:1.5px solid #CBD5E1;border-radius:6px;font-size:12px;width:100%;font-family:inherit;resize:vertical;background:var(--yellow)"
+        oninput="updateProc('${b}','rationale',this.value)" placeholder="Bir önceki batchten ne değişti ve neden?">${rationale}</textarea></div>`;
+
+    html += `</div></div>`;
+
+    // Dissolution per batch
+    html += `<div class="card"><div class="card-header blue">🧪 ${b} — Test Dissolüsyon Ortalamaları (f2 için)</div><div class="card-body">`;
+    html += `<p style="font-size:11px;color:var(--gray-dark);margin-bottom:10px">Her zaman noktası için test ürününün ortalama çözünme değerini (%) girin.</p>`;
+    html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">`;
+    PHS.forEach(ph => {
+      html += `<div><div class="section-title">${PH_LABELS[ph]}</div><table><thead><tr><th class="dark">t (dak)</th><th class="green">Ort. %</th></tr></thead><tbody>`;
+      TP.filter(t=>t>0).forEach(tp => {
+        const v = ST.process[b]?.diss?.[ph]?.[tp] || '';
+        html += `<tr><td class="label-td">${tp}</td><td><input type="number" step="0.1" value="${v}"
+          oninput="updateProcDiss('${b}','${ph}',${tp},this.value)"
+          style="width:80px;background:var(--light-grn)"></td></tr>`;
+      });
+      html += `</tbody></table></div>`;
+    });
+    html += `</div></div></div>`;
+
+    html += `</div>`; // proc-panel
+  });
+  panelsEl.innerHTML = html;
+}
+
+function switchProcBatch(b, el) {
+  window._activeProcBatch = b;
+  document.querySelectorAll('.proc-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.proc-panel').forEach(p=>p.classList.remove('active'));
+  const panel = document.getElementById(`proc-panel-${b}`);
+  if(panel) panel.classList.add('active');
+}
+
+function updateProc(b, field, val) {
+  if(!ST.process[b]) ST.process[b] = {};
+  ST.process[b][field] = val;
+  autoSave();
+}
+
+function updateProcDiss(b, ph, tp, val) {
+  if(!ST.process[b]) ST.process[b] = {};
+  if(!ST.process[b].diss) ST.process[b].diss = {};
+  if(!ST.process[b].diss[ph]) ST.process[b].diss[ph] = {};
+  ST.process[b].diss[ph][tp] = val;
+  autoSave();
+}
+
+function collectProcessInputs() {
+  BATCH_IDS.forEach(b => {
+    PROC_FIELDS.forEach(f => {
+      const el = document.getElementById(`proc-${b}-${f.id}`);
+      if(el) {
+        if(!ST.process[b]) ST.process[b] = {};
+        ST.process[b][f.id] = el.value;
+      }
+    });
+    ['description','rationale'].forEach(fid => {
+      const el = document.getElementById(`proc-${b}-${fid}`);
+      if(el) {
+        if(!ST.process[b]) ST.process[b] = {};
+        ST.process[b][fid] = el.value;
+      }
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 3.2.P.2 LIVE PREVIEW
+// ═══════════════════════════════════════════════════════════════════════════
+let _p2Timer;
+function scheduleP2Preview() {
+  clearTimeout(_p2Timer);
+  _p2Timer = setTimeout(updateP2Preview, 300);
+}
+
+function updateP2Preview() {
+  const wrap = document.getElementById('p2-preview-wrap');
+  if(!wrap) return;
+  const prod = ST.project.p_name || '[Ürün Adı]';
+  const api  = ST.project.p_api  || '[API]';
+  const dosage = ST.project.p_dosage || 'Film Kaplı Tablet';
+  const strength = ST.project.p_strength || '';
+  const ref  = ST.project.r_name || '[Referans Ürün]';
+  const refBatch = ST.project.r_batch || '—';
+  const owner = ST.project.p_owner || '';
+  const std  = ST.project.r_standard || 'Ph.Eur.';
+  const today = new Date().toLocaleDateString('tr-TR');
+
+  let html = `<div style="text-align:center;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #333">
+    <div style="font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#1F3864">CTD Module 3 — 3.2.P.2</div>
+    <div style="font-size:18px;font-weight:700;margin:6px 0">Pharmaceutical Development</div>
+    <div style="font-size:13px;color:#555">${prod}${strength?' — '+strength:''} &nbsp;|&nbsp; ${dosage}</div>
+    <div style="font-size:11px;color:#888;margin-top:4px">${owner?'Sorumlu: '+owner+' &nbsp;|&nbsp; ':''} Tarih: ${today}</div>
+  </div>`;
+
+  // Introduction
+  html += `<h3>3.2.P.2 Pharmaceutical Development</h3>
+  <p>Bu bölüm, <strong>${prod}</strong> adlı ${dosage.toLowerCase()} için gerçekleştirilen farmasötik geliştirme çalışmalarını özetlemektedir. Referans ürün olarak <strong>${ref}</strong> (Seri: ${refBatch}) kullanılmıştır. Formülasyon geliştirme çalışmaları ${std} standartları çerçevesinde yürütülmüştür.</p>`;
+
+  // P2.1 Components
+  html += `<h3>3.2.P.2.1 Components of the Drug Product</h3>`;
+
+  // P2.1.1 Drug Substances
+  html += `<h4>3.2.P.2.1.1 Drug Substances</h4>`;
+  const apis = (ST.formula.excipients||[]).filter(e=>e.isApi);
+  if(apis.length) {
+    html += `<table><thead><tr><th>API</th><th>Fonksiyon</th><th>Grade</th></tr></thead><tbody>`;
+    apis.forEach(a => {
+      html += `<tr><td><strong>${a.name}</strong></td><td>${a.func||'Aktif Madde'}</td><td>${a.grade||'Ph.Eur.'}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    html += `<p class="empty-note">API bilgisi girilmedi.</p>`;
+  }
+
+  // Ref Char Summary
+  const refChar = ST.refChar || {};
+  const rcParams = ['avg_weight','hardness','friability','disintegration','assay1','total_imp','water'];
+  const rcLabels = {avg_weight:'Ort. Ağırlık (mg)',hardness:'Sertlik (N)',friability:'Friabilite (%)',
+    disintegration:'Dağılma (dak)',assay1:'Assay (% LC)',total_imp:'Toplam Safsızlık (%)',water:'Su İçeriği (%)'};
+  const hasRefChar = rcParams.some(p => refChar[p] && nums(refChar[p]).length > 0);
+  if(hasRefChar) {
+    html += `<h5>Referans Ürün Fizikokimyasal Karakterizasyonu</h5>`;
+    html += `<table><thead><tr><th>Parametre</th><th>Ortalama</th><th>SD</th><th>RSD%</th></tr></thead><tbody>`;
+    rcParams.forEach(p => {
+      if(!refChar[p]) return;
+      const m=mean(refChar[p]), s=std(refChar[p]), r=rsd(refChar[p]);
+      if(m==null) return;
+      html += `<tr><td>${rcLabels[p]||p}</td><td>${fmt(m)}</td><td>${fmt(s)}</td><td>${fmt(r)}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+
+  // P2.1.2 Excipients
+  html += `<h4>3.2.P.2.1.2 Excipients</h4>`;
+  const excips = (ST.formula.excipients||[]).filter(e=>!e.isApi);
+  if(excips.length) {
+    html += `<table><thead><tr><th>Excipient</th><th>Fonksiyon</th><th>Grade/Kaynak</th></tr></thead><tbody>`;
+    excips.forEach(ex => {
+      html += `<tr><td>${ex.name}</td><td>${ex.func||'—'}</td><td>${ex.grade||'—'}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    html += `<p class="empty-note">Excipient bilgisi girilmedi.</p>`;
+  }
+
+  // P2.2 Drug Product
+  html += `<h3>3.2.P.2.2 Drug Product</h3>`;
+  html += `<h4>3.2.P.2.2.1 Formulation Development</h4>`;
+
+  const tw = ST.formula.tabletWeight || 600;
+  const allExcips = ST.formula.excipients || [];
+  const activeBatches = BATCH_IDS.filter(b => {
+    const hasPhys = ST.devPhys[b] && Object.keys(ST.devPhys[b]).length > 0;
+    const hasChem = ST.devChem[b] && Object.keys(ST.devChem[b]).length > 0;
+    const hasProc = ST.process[b] && Object.keys(ST.process[b]).length > 0;
+    const hasForm = allExcips.some((_,ei) => ST.formula.values?.[ei]?.[b]);
+    return hasPhys || hasChem || hasProc || hasForm;
+  });
+
+  if(!activeBatches.length) {
+    html += `<p class="empty-note">Geliştirme verisi girildiğinde formülasyon tabloları burada oluşur.</p>`;
+  }
+
+  let tblNum = 0;
+  activeBatches.forEach(b => {
+    tblNum++;
+    const proc = ST.process[b] || {};
+    html += `<h5>Table 3.2.P.2/${tblNum} — ${b} Formülasyon Kompozisyonu</h5>`;
+    html += `<p class="tbl-num">Üretim Yöntemi: <strong>${proc.method||'—'}</strong>${proc.batchSize?' | Batch Boyutu: '+proc.batchSize+' tablet':''}</p>`;
+
+    // Formulation table
+    if(allExcips.length) {
+      html += `<table><thead><tr><th>Hammadde</th><th>Fonksiyon</th><th>Grade</th><th>% w/w</th><th>mg/tablet</th></tr></thead><tbody>`;
+      let totalPct = 0;
+      allExcips.forEach((ex, ei) => {
+        const pct = parseFloat(ST.formula.values?.[ei]?.[b] || 0) || 0;
+        totalPct += pct;
+        html += `<tr${ex.isApi?' style="font-weight:700;background:#FEFCE8"':''}><td>${ex.name}</td><td>${ex.func||'—'}</td><td>${ex.grade||'—'}</td>
+          <td style="text-align:center">${pct||'—'}</td>
+          <td style="text-align:center">${pct?(pct*tw/100).toFixed(1):'—'}</td></tr>`;
+      });
+      html += `<tr style="background:#1F3864;color:#fff;font-weight:700"><td colspan="3">TOPLAM</td>
+        <td style="text-align:center">${totalPct.toFixed(2)}%</td>
+        <td style="text-align:center">${(totalPct*tw/100).toFixed(1)} mg</td></tr>`;
+      html += `</tbody></table>`;
+    }
+
+    // Process description
+    if(proc.description) {
+      html += `<h5>Üretim Süreci</h5><p>${proc.description.replace(/\n/g,'<br>')}</p>`;
+    }
+
+    // Physical results
+    const phys = ST.devPhys[b];
+    const chem = ST.devChem[b];
+    if(phys || chem) {
+      html += `<h5>Analitik Sonuçlar</h5><table><thead><tr><th>Parametre</th><th>Sonuç</th><th>Spec</th></tr></thead><tbody>`;
+      if(phys?.weight) html += `<tr><td>Ort. Ağırlık</td><td>${fmt(mean(Object.values(phys.weight)))} mg</td><td>—</td></tr>`;
+      if(phys?.hardness) html += `<tr><td>Sertlik</td><td>${fmt(mean(Object.values(phys.hardness)))} N</td><td>NLT 80 N</td></tr>`;
+      if(chem?.assay1) html += `<tr><td>Assay</td><td>${chem.assay1} % LC</td><td>90.0–110.0%</td></tr>`;
+      if(chem?.total_imp) html += `<tr><td>Toplam Safsızlık</td><td>${chem.total_imp} %</td><td>NMT 1.0%</td></tr>`;
+      if(chem?.diss12_15) html += `<tr><td>Diss Q15 (pH 1.2)</td><td>${chem.diss12_15} %</td><td>NLT 85%</td></tr>`;
+      html += `</tbody></table>`;
+    }
+
+    // Dissolution comparison per pH
+    PHS.forEach(ph => {
+      const refDiss = ST.refDiss[ph];
+      const testDiss = proc.diss?.[ph];
+      if(!refDiss && !testDiss) return;
+      const usableTP = TP.filter(t=>t>0);
+      const anyRef = usableTP.some(t => mean(refDiss?.[t]||[]) != null);
+      const anyTest = usableTP.some(t => parseFloat(testDiss?.[t]));
+      if(!anyRef && !anyTest) return;
+
+      html += `<h5>Dissolüsyon Karşılaştırması — ${PH_LABELS[ph]}</h5>`;
+      html += `<table><thead><tr><th>t (dak)</th><th>Ref Ort (%)</th><th>Ref SD</th><th>Ref RSD%</th><th>Test Ort (%)</th><th>R–T</th></tr></thead><tbody>`;
+      let sumSqDiff=0, hasF2Data=true, refAbove85=false;
+      const refs=[], tests=[];
+      usableTP.forEach(tp => {
+        const refVals = refDiss?.[tp]||[];
+        const refM = mean(refVals);
+        const refS = std(refVals);
+        const refR = rsd(refVals);
+        const testM = parseFloat(testDiss?.[tp]) || null;
+        if(refM >= 85) refAbove85=true;
+        refs.push(refM); tests.push(testM);
+        const diff = (refM!=null&&testM!=null) ? (refM-testM).toFixed(2) : '—';
+        if(refM==null||testM==null) hasF2Data=false;
+        else sumSqDiff += (refM-testM)**2;
+        html += `<tr><td>${tp}</td><td>${fmt(refM)}</td><td>${fmt(refS)}</td><td>${fmt(refR)}</td>
+          <td>${testM!=null?testM.toFixed(1):'—'}</td><td>${diff}</td></tr>`;
+      });
+      html += `</tbody></table>`;
+
+      // f2
+      if(refAbove85) {
+        html += `<p>f2 = <strong>N/A</strong> — 85% Kuralı uygulandı (herhangi bir zaman noktasında Ref ≥ 85%)</p>`;
+      } else if(hasF2Data) {
+        const n = usableTP.length;
+        const f2 = 50 * Math.log10(100 / Math.sqrt(1 + sumSqDiff/n));
+        const pass = f2 >= 50;
+        html += `<p>f2 = <strong class="${pass?'f2-pass':'f2-fail'}">${f2.toFixed(1)}</strong> → <span class="${pass?'f2-pass':'f2-fail'}">${pass?'✅ BENZERLİK MEVCUT (f2 ≥ 50)':'⚠️ BENZERLİK YOK (f2 < 50)'}</span></p>`;
+      }
+    });
+
+    // Rationale
+    if(proc.rationale) {
+      html += `<h5>Değişiklik Gerekçesi</h5><p style="background:#FEFCE8;padding:8px;border-left:3px solid #D97706;font-style:italic">${proc.rationale}</p>`;
+    }
+    html += `<hr style="margin:18px 0;border-color:#ddd">`;
+  });
+
+  // P2.3 Manufacturing Process Development
+  html += `<h3>3.2.P.2.3 Manufacturing Process Development</h3>`;
+  const batchesWithProc = BATCH_IDS.filter(b => ST.process[b]?.method);
+  if(batchesWithProc.length) {
+    html += `<table><thead><tr><th>Batch</th><th>Üretim Yöntemi</th><th>Batch Boyutu</th><th>Hedef Sertlik (N)</th><th>Kaplama (%)</th><th>Gerekçe</th></tr></thead><tbody>`;
+    batchesWithProc.forEach(b => {
+      const p = ST.process[b];
+      html += `<tr><td><strong>${b}</strong></td><td>${p.method||'—'}</td><td>${p.batchSize||'—'}</td>
+        <td>${p.hardness||'—'}</td><td>${p.coatPct||'—'}</td>
+        <td style="font-size:11px;max-width:200px">${(p.rationale||'').substring(0,120)}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    html += `<p class="empty-note">Üretim yöntemi bilgisi girilmedi.</p>`;
+  }
+
+  html += `<div style="margin-top:24px;padding-top:12px;border-top:1px solid #ccc;font-size:10px;color:#aaa;text-align:center">
+    Bu doküman FormDev takip sistemi tarafından otomatik oluşturulmuştur. CTD 3.2.P.2 formatında hazırlanmıştır. ${today}
+  </div>`;
+
+  wrap.innerHTML = html;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COLLECT ALL
+// ═══════════════════════════════════════════════════════════════════════════
+function collectAllInputs() {
+  collectDashboardInputs();
+  collectProcessInputs();
+  collectExecInputs();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg, isErr=false) {
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.background=isErr?'#7B1515':'#1E293B';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+// ── Project Manager Functions ─────────────────────────────────────────────
+function renderProjectManager() {
+  const list = getProjList();
+  const grid = document.getElementById('pm-cards-grid');
+  if(!grid) return;
+  if(!list.length) {
+    grid.innerHTML = `
+      <div class="pm-empty">
+        <div class="em-icon">🧪</div>
+        <h3>Henüz proje yok</h3>
+        <p>İlk formülasyon projenizi oluşturmak için "Yeni Proje Oluştur" butonuna tıklayın.</p>
+      </div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p => {
+    const d = new Date(p.lastModified||p.created||0);
+    const dateStr = isNaN(d)?'—':d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
+    return `
+    <div class="pm-card" onclick="openProject('${p.id}')">
+      <button class="pm-del-btn" onclick="event.stopPropagation();deleteProject('${p.id}')" title="Projeyi Sil">🗑</button>
+      <div class="pm-card-name">${p.name||'İsimsiz Proje'}</div>
+      <div class="pm-card-api">${p.api||'API belirtilmedi'}</div>
+      <div class="pm-card-meta">
+        ${p.dosage?`<span class="pm-card-tag">${p.dosage}</span>`:''}
+        ${p.strength?`<span class="pm-card-tag">${p.strength}</span>`:''}
+        ${p.owner?`<span class="pm-card-tag">👤 ${p.owner}</span>`:''}
+      </div>
+      <div class="pm-card-footer">
+        <span class="pm-card-date">Son güncelleme: ${dateStr}</span>
+        <button class="pm-open-btn" onclick="event.stopPropagation();openProject('${p.id}')">Aç →</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openProject(id) {
+  const data = getProjData(id);
+  CURRENT_PROJECT_ID = id;
+
+  // Reset ST to defaults then merge saved data
+  Object.assign(ST, {
+    project:{}, refChar:{}, refDiss:{},
+    devPhys:{}, devChem:{},
+    formula:{ tabletWeight:600, batchSize:5000, excipients:[], values:{} },
+    f2:{}, process:{}, exec:{ mol:{}, ref:{}, reg:{}, dev:{}, risk:{} }
+  });
+  if(data) {
+    try { Object.assign(ST, data); } catch(_) {}
+  }
+  if(!ST.formula.excipients) ST.formula.excipients = [];
+
+  // Update sidebar project name
+  const list = getProjList();
+  const meta = list.find(p => p.id === id);
+  const sn = document.getElementById('sidebar-proj-name');
+  if(sn) sn.textContent = meta?.name || 'Proje';
+
+  // Show app
+  document.getElementById('proj-manager').classList.add('hidden');
+  document.body.classList.remove('no-project');
+  showPage('dashboard');
+}
+
+function returnToProjectManager() {
+  saveAll();
+  CURRENT_PROJECT_ID = null;
+  document.body.classList.add('no-project');
+  document.getElementById('proj-manager').classList.remove('hidden');
+  renderProjectManager();
+}
+
+function openNewProjectModal() {
+  document.getElementById('pm-modal-overlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('pm-new-name')?.focus(), 50);
+}
+function closeNewProjectModal() {
+  document.getElementById('pm-modal-overlay').classList.add('hidden');
+  ['pm-new-name','pm-new-api','pm-new-strength','pm-new-owner'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+}
+
+function createNewProject() {
+  const name = document.getElementById('pm-new-name')?.value?.trim();
+  if(!name) { document.getElementById('pm-new-name')?.focus(); return; }
+  const id = genId();
+  const meta = {
+    id,
+    name,
+    api:      document.getElementById('pm-new-api')?.value?.trim()      || '',
+    dosage:   document.getElementById('pm-new-dosage')?.value            || 'Film Kaplı Tablet',
+    strength: document.getElementById('pm-new-strength')?.value?.trim() || '',
+    owner:    document.getElementById('pm-new-owner')?.value?.trim()    || '',
+    created:  new Date().toISOString(),
+    lastModified: new Date().toISOString(),
+  };
+  const list = getProjList();
+  list.unshift(meta);
+  saveProjList(list);
+  // Save empty project data with pre-filled project fields
+  const emptyData = {
+    project:{ p_name:meta.name, p_api:meta.api, p_dosage:meta.dosage, p_strength:meta.strength, p_owner:meta.owner },
+    refChar:{}, refDiss:{}, devPhys:{}, devChem:{},
+    formula:{ tabletWeight:600, batchSize:5000, excipients:[], values:{} },
+    f2:{}, process:{}, exec:{ mol:{name:meta.api}, ref:{}, reg:{}, dev:{form:meta.dosage,strength:meta.strength}, risk:{} }
+  };
+  saveProjData(id, emptyData);
+  closeNewProjectModal();
+  openProject(id);
+}
+
+function deleteProject(id) {
+  const list = getProjList();
+  const proj = list.find(p=>p.id===id);
+  if(!confirm(`"${proj?.name||'Bu proje'}" silinecek. Bu işlem geri alınamaz. Devam?`)) return;
+  saveProjList(list.filter(p=>p.id!==id));
+  localStorage.removeItem('formdev_data_'+id);
+  renderProjectManager();
+}
+
+// Close modal on overlay click
+document.getElementById('pm-modal-overlay')?.addEventListener('click', function(e){
+  if(e.target===this) closeNewProjectModal();
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+loadState();
+renderProjectManager();
+
+// Keyboard save
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveAll();}
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BELGE ÇEVİRİSİ
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Regulatory glossaries ────────────────────────────────────────────────
+const TR_GLOSSARY = {
+  ICH: {
+    en: {
+      tr: {
+        'active pharmaceutical ingredient':'aktif farmasötik madde (API)',
+        'active substance':'aktif madde','excipient':'yardımcı madde',
+        'batch':'parti','lot':'parti','specification':'spesifikasyon',
+        'dissolution':'çözünme','impurity':'safsızlık / yabancı madde',
+        'degradation product':'bozunma ürünü','stability':'stabilite',
+        'shelf life':'raf ömrü','bioequivalence':'biyoeşdeğerlik',
+        'bioavailability':'biyoyararlanım','release':'salım',
+        'in vitro':'in vitro','in vivo':'in vivo',
+        'manufacturing process':'üretim süreci','formulation':'formülasyon',
+        'dosage form':'doz formu','tablet':'tablet','capsule':'kapsül',
+        'coating':'kaplama','granulation':'granülasyon',
+        'compression':'kompresyon / sıkıştırma','blend':'karışım',
+        'drug product':'ilaç ürünü','drug substance':'ilaç maddesi',
+        'certificate of analysis':'analiz sertifikası (CoA)',
+        'quality control':'kalite kontrol','quality assurance':'kalite güvence',
+        'good manufacturing practice':'iyi üretim uygulamaları (GMP)',
+        'clinical trial':'klinik araştırma','pharmacokinetics':'farmakokinetiği',
+        'pharmacodynamics':'farmakodinamik','mechanism of action':'etki mekanizması',
+      },
+      de: {
+        'active pharmaceutical ingredient':'aktiver pharmazeutischer Wirkstoff (API)',
+        'excipient':'Hilfsstoff','batch':'Charge','specification':'Spezifikation',
+        'dissolution':'Auflösung','impurity':'Verunreinigung','stability':'Stabilität',
+        'shelf life':'Haltbarkeit','bioequivalence':'Bioäquivalenz',
+        'dosage form':'Darreichungsform','tablet':'Tablette','capsule':'Kapsel',
+        'coating':'Beschichtung','granulation':'Granulierung',
+        'drug product':'Arzneimittel','drug substance':'Wirkstoff',
+        'quality control':'Qualitätskontrolle',
+        'good manufacturing practice':'Gute Herstellungspraxis (GMP)',
+      },
+      fr: {
+        'active pharmaceutical ingredient':'substance pharmaceutique active (API)',
+        'excipient':'excipient','batch':'lot','specification':'spécification',
+        'dissolution':'dissolution','impurity':'impureté','stability':'stabilité',
+        'shelf life':'durée de conservation','bioequivalence':'bioéquivalence',
+        'dosage form':'forme pharmaceutique','tablet':'comprimé','capsule':'gélule',
+        'drug product':'médicament','drug substance':'substance active',
+        'quality control':'contrôle qualité','good manufacturing practice':'bonnes pratiques de fabrication (BPF)',
+      },
+    }
+  },
+  USP: {
+    en: {
+      tr: {
+        'united states pharmacopeia':'Amerika Birleşik Devletleri Farmakopesi (USP)',
+        'national formulary':'Ulusal Formüler (NF)',
+        'monograph':'monografi','assay':'miktar tayini / assay',
+        'potency':'etkinlik / potensi','purity':'saflık','identity':'kimlik',
+        'reference standard':'referans standart',
+        'certificate of analysis':'analiz sertifikası (CoA)',
+        'out of specification':'spesifikasyon dışı (OOS)',
+        'out of trend':'trend dışı (OOT)',
+        'packaging':'ambalajlama','labeling':'etiketleme',
+      }
+    }
+  },
+  EP: {
+    en: {
+      tr: {
+        'european pharmacopoeia':'Avrupa Farmakopesi (Ph.Eur.)',
+        'pharmacopoeia':'farmakope','monograph':'monografi',
+        'herbal drug':'bitkisel ilaç','mother tincture':'ana tentür',
+        'certificate of suitability':'uygunluk sertifikası (CEP)',
+        'european directorate':'Avrupa Direktifliği',
+        'assay':'miktar tayini','identification':'kimlik tayini',
+        'related substances':'ilgili maddeler',
+        'heavy metals':'ağır metaller','residual solvents':'rezidüel çözücüler',
+        'water determination':'su tayini','loss on drying':'kurutmada kayıp',
+      }
+    }
+  },
+  JP: {
+    en: {
+      tr: {
+        'japanese pharmacopoeia':'Japon Farmakopesi (JP)',
+        'pmda':'Japonya İlaç ve Tıbbi Cihazlar Ajansı (PMDA)',
+        'approval':'onay','marketing authorization':'pazarlama izni',
+      }
+    }
+  },
+  BP: {
+    en: {
+      tr: {
+        'british pharmacopoeia':'İngiliz Farmakopesi (BP)',
+        'mhra':'İngiliz İlaç ve Sağlık Ürünleri Düzenleyici Ajansı (MHRA)',
+        'marketing authorisation':'pazarlama yetkisi',
+      }
+    }
+  }
+};
+
+let _trExtractedText = '';
+let _trCurrentStd = 'ICH';
+
+function initTranslatePage() {
+  // restore saved deepl key
+  const saved = localStorage.getItem('formdev_deepl_key');
+  if(saved) { const el=document.getElementById('tr-apikey'); if(el) el.value=saved; }
+  renderGlossary(_trCurrentStd, 'en', 'tr');
+}
+
+function handleDocxSelect(input) {
+  if(input.files?.[0]) loadDocxFile(input.files[0]);
+}
+function handleDocxDrop(e) {
+  const f = e.dataTransfer?.files?.[0];
+  if(f && f.name.endsWith('.docx')) loadDocxFile(f);
+  else trStatus('Sadece .docx dosyası desteklenir.', true);
+}
+
+function loadDocxFile(file) {
+  const info = document.getElementById('tr-file-info');
+  if(info){ info.style.display='block'; info.textContent = `📄 ${file.name} (${(file.size/1024).toFixed(1)} KB) yükleniyor…`; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    mammoth.extractRawText({arrayBuffer: e.target.result})
+      .then(result => {
+        _trExtractedText = result.value || '';
+        const el = document.getElementById('tr-extracted-text');
+        if(el) el.textContent = _trExtractedText || '(Metin çıkarılamadı)';
+        if(info) info.textContent = `✓ ${file.name} — ${_trExtractedText.split(/\s+/).filter(Boolean).length} kelime çıkarıldı`;
+        const cnt = document.getElementById('tr-src-count');
+        if(cnt) cnt.textContent = `${_trExtractedText.split(/\s+/).filter(Boolean).length} kelime · ${_trExtractedText.length} karakter`;
+        trStatus('Belge yüklendi. Çeviriyi başlatabilirsiniz.', false);
+      })
+      .catch(err => { trStatus('Dosya okunamadı: ' + err.message, true); });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function selectStd(btn) {
+  document.querySelectorAll('.tr-std-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _trCurrentStd = btn.dataset.std;
+  const src = document.getElementById('tr-src-lang')?.value || 'en';
+  const tgt = document.getElementById('tr-tgt-lang')?.value || 'tr';
+  renderGlossary(_trCurrentStd, src, tgt);
+}
+
+function renderGlossary(std, src, tgt) {
+  const panel = document.getElementById('tr-glossary-panel');
+  if(!panel) return;
+  const stdData = TR_GLOSSARY[std]?.[src]?.[tgt];
+  if(!stdData) {
+    panel.innerHTML = `<p style="color:#64748B;font-size:12px">Bu dil çifti için ${std} terminoloji listesi mevcut değil.</p>`;
+    return;
+  }
+  const rows = Object.entries(stdData).slice(0,15).map(([en,tr])=>
+    `<tr><td>${en}</td><td style="color:#60A5FA;font-weight:600">${tr}</td></tr>`
+  ).join('');
+  panel.innerHTML = `
+    <table class="tr-glossary-table" style="width:100%">
+      <thead><tr><th>Orijinal (${src.toUpperCase()})</th><th>${std} Karşılığı (${tgt.toUpperCase()})</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${Object.keys(stdData).length>15?`<p style="font-size:10.5px;color:#64748B;margin-top:4px">+${Object.keys(stdData).length-15} ek terim çeviride otomatik uygulanır.</p>`:''}
+  `;
+}
+
+function toggleApiKey() {
+  const eng = document.getElementById('tr-engine')?.value;
+  const row = document.getElementById('tr-apikey-row');
+  if(row) row.style.display = eng === 'deepl' ? 'block' : 'none';
+}
+
+function trStatus(msg, isError=false) {
+  const el = document.getElementById('tr-status-msg');
+  if(el){ el.textContent = msg; el.style.color = isError ? '#EF4444' : '#94A3B8'; }
+}
+
+function setProgress(pct) {
+  const bar  = document.getElementById('tr-progress-bar');
+  const wrap = document.getElementById('tr-progress');
+  if(wrap) wrap.style.display = pct > 0 && pct < 100 ? 'block' : 'none';
+  if(bar)  bar.style.width = pct + '%';
+}
+
+// ── Chunk text into max N chars, splitting at sentence boundaries ─────────
+function chunkText(text, maxLen=450) {
+  const paragraphs = text.split(/\n+/).filter(p => p.trim());
+  const chunks = [];
+  let cur = '';
+  for(const para of paragraphs) {
+    if((cur + '\n' + para).length <= maxLen) {
+      cur = cur ? cur + '\n' + para : para;
+    } else {
+      if(cur) chunks.push(cur);
+      // paragraph itself too long — split by sentence
+      if(para.length > maxLen) {
+        const sents = para.match(/[^.!?]+[.!?]+/g) || [para];
+        let sc = '';
+        for(const s of sents) {
+          if((sc+' '+s).length <= maxLen) sc = sc ? sc+' '+s : s;
+          else { if(sc) chunks.push(sc); sc = s; }
+        }
+        if(sc) cur = sc;
+        else cur = '';
+      } else {
+        cur = para;
+      }
+    }
+  }
+  if(cur) chunks.push(cur);
+  return chunks;
+}
+
+// ── Apply regulatory glossary post-processing ─────────────────────────────
+function applyGlossary(text, std, src, tgt) {
+  const terms = TR_GLOSSARY[std]?.[src]?.[tgt];
+  if(!terms) return text;
+  let out = text;
+  // Sort by length descending to replace longer phrases first
+  const sorted = Object.entries(terms).sort((a,b) => b[0].length - a[0].length);
+  for(const [orig, repl] of sorted) {
+    // Case-insensitive whole-word replacement
+    const re = new RegExp('\\b' + orig.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b', 'gi');
+    out = out.replace(re, repl);
+  }
+  return out;
+}
+
+// ── MyMemory translate ────────────────────────────────────────────────────
+async function translateMyMemory(text, src, tgt) {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`;
+  const r = await fetch(url, {signal: AbortSignal.timeout(12000)});
+  if(!r.ok) throw new Error('MyMemory API hatası: ' + r.status);
+  const d = await r.json();
+  if(d.responseStatus !== 200) throw new Error(d.responseMessage || 'Çeviri hatası');
+  return d.responseData?.translatedText || text;
+}
+
+// ── DeepL translate ───────────────────────────────────────────────────────
+async function translateDeepL(text, src, tgt, apiKey) {
+  const DEEPL_LANG = {en:'EN',tr:'TR',de:'DE',fr:'FR',es:'ES',it:'IT',ja:'JA',zh:'ZH',ko:'KO',pt:'PT'};
+  const srcL = DEEPL_LANG[src] || src.toUpperCase();
+  const tgtL = DEEPL_LANG[tgt] || tgt.toUpperCase();
+  const body = new URLSearchParams({
+    auth_key: apiKey, text, source_lang: srcL, target_lang: tgtL,
+    formality: 'more', split_sentences: 'nonewlines',
+    preserve_formatting: '1',
+  });
+  const r = await fetch('https://api-free.deepl.com/v2/translate', {
+    method:'POST', body, signal: AbortSignal.timeout(15000)
+  });
+  if(!r.ok) {
+    const err = await r.json().catch(()=>({}));
+    throw new Error('DeepL hatası: ' + (err.message || r.status));
+  }
+  const d = await r.json();
+  return d.translations?.[0]?.text || text;
+}
+
+async function startTranslation() {
+  if(!_trExtractedText.trim()) {
+    trStatus('Önce bir .docx dosyası yükleyin.', true); return;
+  }
+  const src    = document.getElementById('tr-src-lang')?.value || 'en';
+  const tgt    = document.getElementById('tr-tgt-lang')?.value || 'tr';
+  const engine = document.getElementById('tr-engine')?.value || 'mymemory';
+  const apiKey = document.getElementById('tr-apikey')?.value?.trim();
+  const std    = _trCurrentStd;
+
+  if(engine === 'deepl' && !apiKey) {
+    trStatus('DeepL için API anahtarı gereklidir.', true); return;
+  }
+  if(src === tgt) { trStatus('Kaynak ve hedef dil aynı olamaz.', true); return; }
+
+  // Disable button
+  const btn = document.querySelector('[onclick="startTranslation()"]');
+  if(btn) { btn.disabled = true; btn.textContent = '⏳ Çevriliyor…'; }
+
+  const output = document.getElementById('tr-output');
+  if(output) output.innerHTML = '';
+
+  const label = document.getElementById('tr-output-label');
+  if(label) label.textContent = `${src.toUpperCase()} → ${tgt.toUpperCase()} · ${std} · ${engine}`;
+
+  const chunks = chunkText(_trExtractedText, engine==='deepl' ? 4000 : 450);
+  trStatus(`${chunks.length} parça halinde çevriliyor…`);
+  setProgress(1);
+
+  const results = [];
+  for(let i=0; i<chunks.length; i++) {
+    try {
+      let translated;
+      if(engine === 'deepl') {
+        translated = await translateDeepL(chunks[i], src, tgt, apiKey);
+      } else {
+        translated = await translateMyMemory(chunks[i], src, tgt);
+      }
+      // Apply regulatory glossary post-processing
+      translated = applyGlossary(translated, std, src, tgt);
+      results.push(translated);
+      setProgress(Math.round((i+1)/chunks.length*95));
+      trStatus(`${i+1}/${chunks.length} parça çevrildi…`);
+      // Small delay to avoid rate limiting
+      if(engine==='mymemory' && i < chunks.length-1) await new Promise(r=>setTimeout(r,350));
+    } catch(err) {
+      trStatus(`Hata (parça ${i+1}): ${err.message}`, true);
+      results.push('[ÇEVRİ HATASI: ' + err.message + ']\n' + chunks[i]);
+    }
+  }
+
+  const finalText = results.join('\n\n');
+  if(output) {
+    output.textContent = finalText;
+    output.style.color = '';
+  }
+  updateTgtCount();
+  setProgress(100);
+  trStatus(`✓ Çeviri tamamlandı. ${results.length} parça · ${std} terminolojisi uygulandı.`);
+  if(btn) { btn.disabled = false; btn.innerHTML = '🌐 Çeviriyi Başlat'; }
+
+  // Update glossary panel for current lang pair
+  renderGlossary(std, src, tgt);
+}
+
+function updateTgtCount() {
+  const el  = document.getElementById('tr-output');
+  const cnt = document.getElementById('tr-tgt-count');
+  if(!el || !cnt) return;
+  const txt = el.textContent || '';
+  cnt.textContent = `${txt.split(/\s+/).filter(Boolean).length} kelime · ${txt.length} karakter`;
+}
+
+function copyTranslation() {
+  const el = document.getElementById('tr-output');
+  if(!el) return;
+  navigator.clipboard.writeText(el.textContent || '')
+    .then(()=>toast('✓ Panoya kopyalandı'))
+    .catch(()=>{ const r=document.createRange();r.selectNode(el);window.getSelection()?.removeAllRanges();window.getSelection()?.addRange(r); });
+}
+
+function clearTranslation() {
+  _trExtractedText = '';
+  const ids = ['tr-extracted-text','tr-file-info','tr-src-count','tr-tgt-count','tr-status-msg','tr-output-label'];
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=''; });
+  const out = document.getElementById('tr-output');
+  if(out) out.innerHTML = '<span style="color:#aaa;font-style:italic">Çeviri burada görünecek.</span>';
+  const finput = document.getElementById('tr-file-input');
+  if(finput) finput.value = '';
+  setProgress(0);
+}
+
+function exportTranslation() {
+  const src  = document.getElementById('tr-src-lang')?.value || 'en';
+  const tgt  = document.getElementById('tr-tgt-lang')?.value || 'tr';
+  const std  = _trCurrentStd;
+  const text = document.getElementById('tr-output')?.textContent || '';
+  if(!text.trim()) { trStatus('Önce çeviri yapın.', true); return; }
+  const today = new Date().toLocaleDateString('tr-TR');
+  const projName = ST.project?.p_name || 'FormDev Proje';
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="${tgt}"><head><meta charset="UTF-8">
+    <title>Çeviri — ${projName}</title>
+    <style>
+      body{font-family:Georgia,serif;font-size:12pt;color:#111;max-width:800px;margin:0 auto;padding:40px 48px;line-height:1.75}
+      .cover{text-align:center;border-bottom:2px solid #1F3864;margin-bottom:28px;padding-bottom:16px}
+      .cover h1{font-size:16pt;color:#1F3864;margin:0 0 6px}
+      .cover p{font-size:10pt;color:#666;margin:2px 0}
+      pre{white-space:pre-wrap;font-family:Georgia,serif;font-size:11pt;line-height:1.75}
+      .footer{margin-top:32px;border-top:1px solid #ccc;padding-top:10px;font-size:9pt;color:#999;text-align:center}
+    </style></head><body>
+    <div class="cover">
+      <h1>${projName}</h1>
+      <p>Çeviri: ${src.toUpperCase()} → ${tgt.toUpperCase()} &nbsp;|&nbsp; Standart: ${std} &nbsp;|&nbsp; ${today}</p>
+      <p style="font-size:9pt">FormDev Regüle Belge Çeviri Modülü tarafından oluşturulmuştur.</p>
+    </div>
+    <pre>${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+    <div class="footer">GİZLİ — FormDev · ${today} · ${std} terminolojisi uygulanmıştır</div>
+    </body></html>`);
+  win.document.close();
+  win.print();
+}
+
+</script>
+</body>
+</html>
